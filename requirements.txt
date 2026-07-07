@@ -1,0 +1,10 @@
+# QAPINN-BQP — pinned to the working environment (WISER 2026)
+# CPU-only torch (Lenovo ThinkPad E14, no GPU). Install torch from the CPU index:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.2,<2.9
+pennylane==0.45.1
+pennylane_lightning==0.45.0
+numpy==2.5.0
+scipy==1.18.0
+matplotlib==3.11.0
+pyyaml>=6.0
