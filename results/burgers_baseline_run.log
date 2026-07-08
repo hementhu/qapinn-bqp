@@ -1,0 +1,3 @@
+[burgers_baseline] params=3021 | seed=0
+[burgers_baseline] DONE  rel_L2=2.223e-03  final_total=9.907e-06  time=343.8s
+[burgers_baseline] results -> results\burgers_baseline
