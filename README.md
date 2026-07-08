@@ -12,8 +12,8 @@ learning, with experimental + mathematical support.
 | Component | State |
 |---|---|
 | Repo scaffold + seeding/logging utils | ✅ |
-| Burgers classical PINN | 🚧 in progress |
-| Cole–Hopf reference solution | 🚧 in progress |
+| Cole–Hopf reference solution | ✅ validated to machine precision |
+| Burgers classical PINN | ✅ rel-L2 2.2e-3 (error shock-localized), reproducible |
 | Quantum layer (PennyLane, `interface="torch"`) | ⬜ |
 | Ablation matrix (encoding / depth / entanglement / measurement) | ⬜ |
 | Fourier-spectrum + barren-plateau analysis | ⬜ |

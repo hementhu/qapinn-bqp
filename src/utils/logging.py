@@ -23,11 +23,17 @@ class RunLogger:
         self._fieldnames: list[str] | None = None
 
     def log_step(self, **fields: Any) -> None:
-        """Append one row of scalars to history.csv (header written once)."""
+        """Append one row of scalars to history.csv (header written once).
+
+        The first write truncates any pre-existing file (mode "w") so re-running
+        an experiment starts a clean history instead of stacking onto the old
+        run's rows; subsequent writes append.
+        """
         write_header = self._fieldnames is None
+        mode = "w" if write_header else "a"
         if write_header:
             self._fieldnames = list(fields.keys())
-        with self.history_path.open("a", newline="") as f:
+        with self.history_path.open(mode, newline="") as f:
             writer = csv.DictWriter(f, fieldnames=self._fieldnames)
             if write_header:
                 writer.writeheader()
