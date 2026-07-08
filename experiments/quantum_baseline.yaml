@@ -1,0 +1,27 @@
+# Full-quantum PINN baseline — coordinates encoded DIRECTLY into the VQC.
+#   (x,t) --RY re-upload--> [VQC] --measure <Zi>--> Linear(n->1) --> u
+# No classical pre-net, so Schuld's Fourier result applies directly to (x,t):
+# accessible frequency per coordinate = re-upload depth (n_layers).
+name: quantum_baseline
+model: quantum
+
+# --- VQC design knobs (ablation axes) ---
+vqc:
+  n_qubits: 4
+  n_layers: 3               # ansatz / re-upload depth  == max Fourier frequency
+  reupload: true
+  entanglement: linear      # none | linear | ring | all_to_all
+  measurement: multi        # single | multi | zz
+  input_scale: 3.14159265   # angle = pi * coordinate: maps x in [-1,1] to full [-pi,pi]
+
+# --- training (same reduced budget as the other matched-budget runs) ---
+n_interior: 1000
+n_ic: 150
+n_bc: 150
+adam_iters: 2000
+adam_lr: 1.0e-2
+lbfgs_iters: 0
+seed: 0
+log_every: 50
+eval_nx: 256
+eval_nt: 100

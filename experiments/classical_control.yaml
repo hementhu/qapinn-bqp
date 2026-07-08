@@ -1,0 +1,17 @@
+# Parameter-matched classical control for the QAPINN comparison.
+# [2,13,13,1] tanh MLP ~= 235 params, matched to the QAPINN's 237.
+# Same training budget as qapinn_baseline.yaml so the ONLY difference is the
+# quantum layer. (Distinct from burgers_baseline.yaml, the tuned 3021-param net.)
+name: classical_control
+model: classical
+layers: [2, 13, 13, 1]
+n_interior: 1000
+n_ic: 150
+n_bc: 150
+adam_iters: 2000
+adam_lr: 1.0e-2
+lbfgs_iters: 0
+seed: 0
+log_every: 50
+eval_nx: 256
+eval_nt: 100
