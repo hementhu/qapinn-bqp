@@ -1,0 +1,32 @@
+{
+  "name": "cv_cfe_s1",
+  "num_params": 109,
+  "architecture": {
+    "type": "cfe",
+    "width": 4,
+    "post": [
+      4,
+      16,
+      1
+    ],
+    "num_params": 109
+  },
+  "raw": {
+    "name": "cv_cfe_s1",
+    "model": "cfe",
+    "width": 4,
+    "post_hidden": [
+      16
+    ],
+    "pde": "burgers",
+    "n_constraint": 150,
+    "adam_lr": 0.01,
+    "seed": 1,
+    "log_every": 100,
+    "probe_every": 0,
+    "n_interior": 4000,
+    "adam_iters": 2500,
+    "lbfgs_iters": 400,
+    "checkpoint_every": 0
+  }
+}
