@@ -1,0 +1,33 @@
+{
+  "rel_l2": 0.008309168476119547,
+  "final_total": 0.0005352709558792412,
+  "final_pde": 0.0003213047457393259,
+  "final_constraints": 0.00021396619558800012,
+  "train_time_s": 18.95186349999858,
+  "num_params": 121,
+  "config": {
+    "pde": "heat",
+    "n_interior": 1500,
+    "n_constraint": 150,
+    "adam_iters": 2000,
+    "adam_lr": 0.01,
+    "lbfgs_iters": 0,
+    "w_pde": 1.0,
+    "w_constraints": 1.0,
+    "seed": 0,
+    "log_every": 100,
+    "eval_nx": 256,
+    "eval_nt": 100,
+    "probe_every": 25,
+    "checkpoint_every": 500
+  },
+  "architecture": {
+    "type": "classical",
+    "layers": [
+      2,
+      7,
+      11,
+      1
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+# Classical-front-end control: (x,t) -> Linear(2->4) -> tanh -> post[4,16,1] -> u.
+# Structural twin of the 4-qubit QAPINN (same post-net), classical front-end.
+# Trained identically to the QAPINNs so the ONLY difference is quantum vs classical
+# front-end -> isolates the quantum layer's effect on the post-net neurons.
+name: cfe_burgers
+model: cfe
+width: 4                # matches 4-qubit multi-measurement QAPINN output
+post_hidden: [16]
+
+pde: burgers
+n_interior: 1500
+n_constraint: 150
+adam_iters: 2000
+adam_lr: 1.0e-2         # matched to the QAPINN runs
+lbfgs_iters: 0
+seed: 0
+log_every: 100
+probe_every: 25
+checkpoint_every: 500

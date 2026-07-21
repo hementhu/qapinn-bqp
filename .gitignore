@@ -12,6 +12,17 @@ results/**/*.npz
 results/**/checkpoints/
 *.mat
 
+# LaTeX build artifacts (keep the .tex, drop the junk)
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+# 533-page journal PDF is regenerated from project_journal.tex; keep out of history
+report/project_journal.pdf
+
 # OS / editor
 .DS_Store
 Thumbs.db

@@ -1,0 +1,18 @@
+# Classical PINN on Burgers. Matched-parameter control for the QAPINN.
+name: burgers_classical
+pde: burgers
+model: classical
+layers: [2, 7, 11, 1]           # 121 params = QAPINN (matched-parameter control)
+
+# training — matched to burgers_qapinn: same points/iters/optimizer/lr, Adam-only
+n_interior: 1500
+n_constraint: 150               # points per constraint (IC + each wall)
+adam_iters: 2000
+adam_lr: 1.0e-2
+lbfgs_iters: 0
+seed: 0
+log_every: 100
+
+# monitoring (0 = off)
+probe_every: 25                 # F-principle + gradient-variance every 25 Adam iters
+checkpoint_every: 500

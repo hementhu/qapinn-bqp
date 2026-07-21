@@ -1,9 +1,9 @@
-"""Sampling of collocation, initial-condition, and boundary points for Burgers.
+"""PDE-agnostic point sampling: interior collocation + constraint points.
 
-All sampling is driven by an explicit ``torch.Generator`` so runs are
-reproducible from a seed. Interior points use Latin Hypercube sampling (better
-space-filling than i.i.d. uniform, standard for PINNs); IC/BC use structured
-edges. Column convention throughout: (x, t).
+Interior points are Latin-Hypercube-sampled inside the domain box (better space-
+filling than i.i.d. uniform, standard for PINNs) and carry requires_grad=True
+because they feed the residual autograd. Constraint points come from each
+Constraint's own sampler (defined in the PDE module). Everything is seeded.
 """
 from __future__ import annotations
 
@@ -11,51 +11,27 @@ import numpy as np
 import torch
 from scipy.stats import qmc
 
-from src.pdes.burgers import (
-    X_MIN, X_MAX, T_MIN, T_MAX, initial_condition,
-)
+from src.pdes.base import PDESpec
 
 
-def _to_tensor(a: np.ndarray, requires_grad: bool = False) -> torch.Tensor:
-    return torch.tensor(a, dtype=torch.float32, requires_grad=requires_grad)
+def sample_interior(spec: PDESpec, n: int, seed: int, requires_grad: bool = True) -> torch.Tensor:
+    """Latin-Hypercube collocation points in the domain box. Shape (n, in_dim)."""
+    unit = qmc.LatinHypercube(d=spec.in_dim, seed=seed).random(n)   # (n, in_dim) in [0,1)
+    lows = np.array([lo for lo, _ in spec.domain])
+    highs = np.array([hi for _, hi in spec.domain])
+    X = lows + unit * (highs - lows)
+    return torch.tensor(X, dtype=torch.float32, requires_grad=requires_grad)
 
 
-def sample_interior(n: int, seed: int, requires_grad: bool = True) -> torch.Tensor:
-    """Latin Hypercube collocation points in the open domain, shape (n, 2).
+def sample_constraints(spec: PDESpec, n: int, seed: int) -> list[tuple[torch.Tensor, torch.Tensor]]:
+    """For each constraint, return (X_points, target_values), sampled once.
 
-    requires_grad=True by default because these feed the PDE residual (autograd).
+    Uses a distinct sub-seed per constraint so different faces get different
+    points. Points are held fixed for the run (L-BFGS needs a deterministic
+    objective, and fixed points keep runs reproducible).
     """
-    sampler = qmc.LatinHypercube(d=2, seed=seed)
-    unit = sampler.random(n)  # (n, 2) in [0, 1)
-    x = X_MIN + unit[:, 0] * (X_MAX - X_MIN)
-    t = T_MIN + unit[:, 1] * (T_MAX - T_MIN)
-    xt = np.stack([x, t], axis=1)
-    return _to_tensor(xt, requires_grad=requires_grad)
-
-
-def sample_ic(n: int, seed: int) -> tuple[torch.Tensor, torch.Tensor]:
-    """Initial-condition points at t=0. Returns (xt (n,2), u_target (n,1)).
-
-    u(x, 0) = -sin(pi x).
-    """
-    rng = np.random.default_rng(seed)
-    x = rng.uniform(X_MIN, X_MAX, size=n)
-    t = np.zeros(n)
-    xt = np.stack([x, t], axis=1)
-    u = initial_condition(x).reshape(-1, 1)
-    return _to_tensor(xt), _to_tensor(u)
-
-
-def sample_bc(n: int, seed: int) -> tuple[torch.Tensor, torch.Tensor]:
-    """Boundary points at x=+-1. Returns (xt (n,2), u_target (n,1)).
-
-    u(-1, t) = u(1, t) = 0. Half the points on each wall.
-    """
-    rng = np.random.default_rng(seed)
-    n_left = n // 2
-    n_right = n - n_left
-    t = rng.uniform(T_MIN, T_MAX, size=n)
-    x = np.concatenate([np.full(n_left, X_MIN), np.full(n_right, X_MAX)])
-    xt = np.stack([x, t], axis=1)
-    u = np.zeros((n, 1))
-    return _to_tensor(xt), _to_tensor(u)
+    out = []
+    for i, c in enumerate(spec.constraints):
+        Xc = c.sample(n, seed + i)
+        out.append((Xc, c.target(Xc)))
+    return out

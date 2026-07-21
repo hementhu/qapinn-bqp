@@ -1,15 +1,19 @@
-"""Hybrid QAPINN: classical pre-net -> quantum layer -> classical post-net.
+"""QAPINN (Shah et al. 2024, ref [3]): first hidden layer replaced by a VQC.
 
-    (x, t) --pre--> latent (n_qubits) --VQC--> measurements --post--> u
+    X=(x,t) --[fixed coord map]--> VQC (quantum first hidden layer)
+            --> classical post-net (MLP) --> u
 
-Reuses the exact residual/loss/trainer machinery of the classical PINN (it is
-just another ``model(xt) -> u`` callable), so classical-vs-QAPINN ablations are
-controlled comparisons.
+Design choices that match ref [3] and keep the Fourier picture clean:
+  - NO trainable pre-net: the VQC encodes the raw coordinates, so the accessible
+    frequency band lives directly in (x,t) — required for the spectral analysis.
+  - Classical post-net (not a bare linear readout): supplies the flexibility a
+    linear readout lacked (which made a pure-VQC model collapse to the trivial
+    solution). The post-net is just a tanh MLP (reuses PINNMLP).
+  - Fixed round-robin coord map distributes the in_dim inputs across n_qubits
+    (e.g. 4 qubits, 2 inputs -> encode x,t,x,t). Non-trainable, so this is
+    genuinely "a VQC as the first layer," not a learned embedding.
 
-Dimension reconciliation with CLAUDE.md's sketch (pre 2->16, VQC 4 qubits,
-post 4->16->1): the pre-net's final width is pinned to ``n_qubits`` so it emits
-exactly one angle per qubit; the post-net input is pinned to the VQC output dim
-(which depends on the measurement knob).
+Reuses QuantumLayer (all ablation knobs) from vqc.py unchanged.
 """
 from __future__ import annotations
 
@@ -18,85 +22,50 @@ from dataclasses import asdict
 import torch
 import torch.nn as nn
 
-from src.models.quantum_layer import QuantumLayer, VQCConfig
+from src.models.pinn import PINNMLP
+from src.models.vqc import QuantumLayer, VQCConfig
 
 
-def _mlp(dims: list[int], final_act: bool) -> nn.Sequential:
-    """Tanh MLP over the given widths; Xavier init, optional final tanh."""
-    layers: list[nn.Module] = []
-    for i in range(len(dims) - 1):
-        lin = nn.Linear(dims[i], dims[i + 1])
-        nn.init.xavier_normal_(lin.weight)
-        nn.init.zeros_(lin.bias)
-        layers.append(lin)
-        if i < len(dims) - 2 or final_act:
-            layers.append(nn.Tanh())
-    return nn.Sequential(*layers)
-
-
-class HybridPINN(nn.Module):
-    """Classical -> quantum -> classical PINN.
-
-    Args:
-        vqc: VQC configuration (qubits, depth, entanglement, measurement, ...).
-        pre_hidden: hidden widths of the pre-net between input(2) and n_qubits.
-        post_hidden: hidden widths of the post-net between vqc-out and 1.
-        in_dim: coordinate dimension (2 for Burgers (x, t)).
-        out_dim: solution dimension (1 for scalar u).
-    """
-
+class QAPINN(nn.Module):
     def __init__(
         self,
         vqc: VQCConfig,
-        pre_hidden: list[int] | None = None,
         post_hidden: list[int] | None = None,
         in_dim: int = 2,
         out_dim: int = 1,
     ):
         super().__init__()
-        pre_hidden = [16] if pre_hidden is None else list(pre_hidden)
         post_hidden = [16] if post_hidden is None else list(post_hidden)
+        self.in_dim = in_dim
+        self.out_dim = out_dim
 
-        self.quantum = QuantumLayer(vqc)
-        # tanh on the pre-net output bounds encoding angles to (-1, 1)*input_scale
-        self.pre = _mlp([in_dim, *pre_hidden, vqc.n_qubits], final_act=True)
-        self.post = _mlp([self.quantum.out_dim, *post_hidden, out_dim], final_act=False)
+        self.vqc = QuantumLayer(vqc)
+        # fixed (non-trainable) map: qubit i encodes input coordinate (i mod in_dim)
+        self.register_buffer(
+            "coord_map", torch.tensor([i % in_dim for i in range(vqc.n_qubits)])
+        )
+        # classical post-net: vqc measurements -> ... -> u
+        self.post = PINNMLP([self.vqc.out_dim, *post_hidden, out_dim])
 
-    def forward(self, xt: torch.Tensor) -> torch.Tensor:
-        z = self.pre(xt)
-        q = self.quantum(z)
-        return self.post(q)
+    def forward(self, X: torch.Tensor) -> torch.Tensor:
+        z = X[:, self.coord_map]        # (batch, n_qubits): raw coords -> encoding slots
+        q = self.vqc(z)                 # (batch, vqc_out)
+        return self.post(q)             # (batch, out_dim)
 
     def num_parameters(self) -> int:
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
     def parameter_breakdown(self) -> dict:
-        def count(m):
-            return sum(p.numel() for p in m.parameters() if p.requires_grad)
-        return {
-            "pre": count(self.pre),
-            "quantum": count(self.quantum),
-            "post": count(self.post),
-            "total": self.num_parameters(),
-        }
+        vqc_n = sum(p.numel() for p in self.vqc.parameters() if p.requires_grad)
+        post_n = sum(p.numel() for p in self.post.parameters() if p.requires_grad)
+        return {"vqc": vqc_n, "post": post_n, "total": vqc_n + post_n}
 
     def architecture(self) -> dict:
-        """Full, serializable description of the model (for reproducibility)."""
         return {
-            "vqc": asdict(self.quantum.cfg),
-            "pre": [m.in_features for m in self.pre if isinstance(m, nn.Linear)]
-                   + [self.quantum.n_qubits],
-            "post_out_dim": 1,
-            "vqc_out_dim": self.quantum.out_dim,
+            "type": "qapinn",
+            "vqc": asdict(self.vqc.cfg),
+            "coord_map": self.coord_map.tolist(),
+            "vqc_out_dim": self.vqc.out_dim,
+            "post": [self.vqc.out_dim, *[l.out_features for l in self.post.linears]],
             "param_breakdown": self.parameter_breakdown(),
         }
-
-
-def build_qapinn_from_config(cfg: dict) -> "HybridPINN":
-    """Construct a HybridPINN from a parsed YAML dict (see qapinn_baseline.yaml)."""
-    vqc = VQCConfig(**cfg["vqc"])
-    return HybridPINN(
-        vqc,
-        pre_hidden=cfg.get("pre_hidden", [16]),
-        post_hidden=cfg.get("post_hidden", [16]),
-    )

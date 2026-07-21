@@ -1,0 +1,74 @@
+{
+  "Burgers depth-3": {
+    "cfe": {
+      "rel_l2": 0.474,
+      "norm_effrank": 0.286,
+      "postnet_gradvar": 0.0006213760175442396
+    },
+    "qapinn": {
+      "rel_l2": 0.472,
+      "norm_effrank": 0.269,
+      "postnet_gradvar": 0.0040736988154424615
+    }
+  },
+  "Burgers depth-5": {
+    "cfe": {
+      "rel_l2": 0.474,
+      "norm_effrank": 0.286,
+      "postnet_gradvar": 0.0006213760175442396
+    },
+    "qapinn": {
+      "rel_l2": 0.424,
+      "norm_effrank": 0.236,
+      "postnet_gradvar": 0.007138900448037477
+    }
+  },
+  "Heat": {
+    "cfe": {
+      "rel_l2": 0.013,
+      "norm_effrank": 0.239,
+      "postnet_gradvar": 0.0004724195275628951
+    },
+    "qapinn": {
+      "rel_l2": 0.006,
+      "norm_effrank": 0.272,
+      "postnet_gradvar": 0.003217292800955879
+    }
+  },
+  "Burgers 3 qubits": {
+    "cfe": {
+      "rel_l2": 0.496,
+      "norm_effrank": 0.241,
+      "postnet_gradvar": 0.00026132209056257684
+    },
+    "qapinn": {
+      "rel_l2": 0.501,
+      "norm_effrank": 0.266,
+      "postnet_gradvar": 0.0011709967339528005
+    }
+  },
+  "Burgers 5 qubits": {
+    "cfe": {
+      "rel_l2": 0.464,
+      "norm_effrank": 0.265,
+      "postnet_gradvar": 0.0051932138101375095
+    },
+    "qapinn": {
+      "rel_l2": 0.468,
+      "norm_effrank": 0.312,
+      "postnet_gradvar": 0.0011027467217903486
+    }
+  },
+  "Burgers 6 qubits": {
+    "cfe": {
+      "rel_l2": 0.467,
+      "norm_effrank": 0.269,
+      "postnet_gradvar": 0.0019246555139363687
+    },
+    "qapinn": {
+      "rel_l2": 0.443,
+      "norm_effrank": 0.341,
+      "postnet_gradvar": 0.0007225592045427609
+    }
+  }
+}

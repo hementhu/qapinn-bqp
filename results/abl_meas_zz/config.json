@@ -1,0 +1,57 @@
+{
+  "name": "abl_meas_zz",
+  "num_params": 169,
+  "architecture": {
+    "type": "qapinn",
+    "vqc": {
+      "n_qubits": 4,
+      "n_layers": 3,
+      "reupload": true,
+      "entanglement": "linear",
+      "measurement": "zz",
+      "input_scale": 1.0
+    },
+    "coord_map": [
+      0,
+      1,
+      0,
+      1
+    ],
+    "vqc_out_dim": 7,
+    "post": [
+      7,
+      16,
+      1
+    ],
+    "param_breakdown": {
+      "vqc": 24,
+      "post": 145,
+      "total": 169
+    }
+  },
+  "raw": {
+    "name": "abl_meas_zz",
+    "model": "qapinn",
+    "vqc": {
+      "n_qubits": 4,
+      "n_layers": 3,
+      "reupload": true,
+      "entanglement": "linear",
+      "measurement": "zz",
+      "input_scale": 1.0
+    },
+    "post_hidden": [
+      16
+    ],
+    "pde": "burgers",
+    "n_interior": 1500,
+    "n_constraint": 150,
+    "adam_iters": 2000,
+    "adam_lr": 0.01,
+    "lbfgs_iters": 0,
+    "seed": 0,
+    "log_every": 100,
+    "probe_every": 25,
+    "checkpoint_every": 500
+  }
+}

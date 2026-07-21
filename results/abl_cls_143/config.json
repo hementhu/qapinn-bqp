@@ -1,0 +1,33 @@
+{
+  "name": "abl_cls_143",
+  "num_params": 143,
+  "architecture": {
+    "type": "classical",
+    "layers": [
+      2,
+      2,
+      34,
+      1
+    ]
+  },
+  "raw": {
+    "name": "abl_cls_143",
+    "model": "classical",
+    "layers": [
+      2,
+      2,
+      34,
+      1
+    ],
+    "pde": "burgers",
+    "n_interior": 1500,
+    "n_constraint": 150,
+    "adam_iters": 2000,
+    "adam_lr": 0.01,
+    "lbfgs_iters": 0,
+    "seed": 0,
+    "log_every": 100,
+    "probe_every": 25,
+    "checkpoint_every": 500
+  }
+}

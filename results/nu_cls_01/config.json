@@ -1,0 +1,36 @@
+{
+  "name": "nu_cls_01",
+  "num_params": 121,
+  "architecture": {
+    "type": "classical",
+    "layers": [
+      2,
+      7,
+      11,
+      1
+    ]
+  },
+  "raw": {
+    "name": "nu_cls_01",
+    "model": "classical",
+    "layers": [
+      2,
+      7,
+      11,
+      1
+    ],
+    "pde": "burgers",
+    "n_interior": 1500,
+    "n_constraint": 150,
+    "adam_iters": 2000,
+    "adam_lr": 0.01,
+    "lbfgs_iters": 0,
+    "seed": 0,
+    "log_every": 100,
+    "probe_every": 25,
+    "checkpoint_every": 500,
+    "pde_params": {
+      "nu": 0.1
+    }
+  }
+}

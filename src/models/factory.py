@@ -1,22 +1,19 @@
-"""Model factory: build any PINN variant from a parsed YAML config dict.
+"""Model factory: build a classical PINN or the ref [3] QAPINN from a config dict.
 
-Dispatch on the config's ``model`` field:
-    classical -> PINNMLP              (needs ``layers``)
-    quantum   -> QuantumPINN          (needs ``vqc``)           [full quantum]
-    hybrid    -> HybridPINN           (needs ``vqc``, pre/post) [classical->VQC->classical]
-
-Also exposes helpers shared by run.py / run_compare.py so every entrypoint
-builds and serializes models identically.
+Dispatch on the ``model`` field:
+    classical -> PINNMLP   (needs ``layers``)
+    qapinn    -> QAPINN    (needs ``vqc``; optional ``post_hidden``, in/out dims)
 """
 from __future__ import annotations
 
 import torch.nn as nn
 
-from src.models.classical_pinn import PINNMLP
-from src.models.qapinn import build_qapinn_from_config
-from src.models.quantum_pinn import build_quantum_pinn_from_config
+from src.models.classical_frontend import build_cfe_from_config
+from src.models.pinn import PINNMLP
+from src.models.qapinn import QAPINN
+from src.models.vqc import VQCConfig
 
-MODEL_KINDS = ("classical", "quantum", "hybrid")
+MODEL_KINDS = ("classical", "qapinn", "cfe")
 
 
 def build_model(cfg: dict) -> nn.Module:
@@ -25,10 +22,15 @@ def build_model(cfg: dict) -> nn.Module:
         if "layers" not in cfg:
             raise ValueError("classical model requires a 'layers' field")
         return PINNMLP(cfg["layers"])
-    if kind == "quantum":
-        return build_quantum_pinn_from_config(cfg)
-    if kind == "hybrid":
-        return build_qapinn_from_config(cfg)
+    if kind == "qapinn":
+        return QAPINN(
+            VQCConfig(**cfg["vqc"]),
+            post_hidden=cfg.get("post_hidden", [16]),
+            in_dim=cfg.get("in_dim", 2),
+            out_dim=cfg.get("out_dim", 1),
+        )
+    if kind == "cfe":                       # classical-front-end control
+        return build_cfe_from_config(cfg)
     raise ValueError(f"unknown model '{kind}', expected one of {MODEL_KINDS}")
 
 

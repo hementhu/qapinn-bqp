@@ -1,0 +1,57 @@
+{
+  "name": "seed1_ent_ring",
+  "num_params": 121,
+  "architecture": {
+    "type": "qapinn",
+    "vqc": {
+      "n_qubits": 4,
+      "n_layers": 3,
+      "reupload": true,
+      "entanglement": "ring",
+      "measurement": "multi",
+      "input_scale": 1.0
+    },
+    "coord_map": [
+      0,
+      1,
+      0,
+      1
+    ],
+    "vqc_out_dim": 4,
+    "post": [
+      4,
+      16,
+      1
+    ],
+    "param_breakdown": {
+      "vqc": 24,
+      "post": 97,
+      "total": 121
+    }
+  },
+  "raw": {
+    "name": "seed1_ent_ring",
+    "model": "qapinn",
+    "vqc": {
+      "n_qubits": 4,
+      "n_layers": 3,
+      "reupload": true,
+      "entanglement": "ring",
+      "measurement": "multi",
+      "input_scale": 1.0
+    },
+    "post_hidden": [
+      16
+    ],
+    "pde": "burgers",
+    "n_interior": 1500,
+    "n_constraint": 150,
+    "adam_iters": 2000,
+    "adam_lr": 0.01,
+    "lbfgs_iters": 0,
+    "seed": 1,
+    "log_every": 100,
+    "probe_every": 25,
+    "checkpoint_every": 500
+  }
+}

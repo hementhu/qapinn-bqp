@@ -1,0 +1,26 @@
+{
+  "CFE (classical front)": {
+    "rel_l2": 0.474018326949814,
+    "n_postneurons": 16,
+    "norm_effrank": 0.286,
+    "neuron_freq": 1.0,
+    "mean_absW": 0.619,
+    "postnet_gradvar": 0.0006213760175442396
+  },
+  "QAPINN depth-3": {
+    "rel_l2": 0.4722456259795546,
+    "n_postneurons": 16,
+    "norm_effrank": 0.269,
+    "neuron_freq": 1.0,
+    "mean_absW": 0.5573,
+    "postnet_gradvar": 0.0040736988154424615
+  },
+  "QAPINN depth-5": {
+    "rel_l2": 0.42408452711967476,
+    "n_postneurons": 16,
+    "norm_effrank": 0.236,
+    "neuron_freq": 1.06,
+    "mean_absW": 0.5477,
+    "postnet_gradvar": 0.007138900448037477
+  }
+}

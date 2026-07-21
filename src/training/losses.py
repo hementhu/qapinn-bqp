@@ -1,59 +1,51 @@
-"""Composite PINN loss: PDE residual + soft IC/BC penalties.
+"""PDE-agnostic composite loss: residual + constraint (IC/BC/...) penalties.
 
-Soft (penalty) enforcement of IC/BC — deliberately not hard-encoded — so the
-identical loss machinery serves both the classical PINN and the QAPINN, keeping
-the ablation apples-to-apples (a hard-constrained output would be awkward for the
-VQC's bounded range).
+Soft (penalty) enforcement of all constraints, so the identical loss serves the
+classical PINN and the QAPINN — the only difference between them is the model.
+The loss walks spec.residual and spec.constraints; it never names a PDE, an
+equation count, or a constraint type. That is what makes it run Burgers, heat,
+and 3-equation Navier-Stokes with no change.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Callable
+from dataclasses import dataclass, field
 
 import torch
 import torch.nn.functional as F
 
-from src.pdes.burgers import NU_DEFAULT, pde_residual
-
-Model = Callable[[torch.Tensor], torch.Tensor]
+from src.pdes.base import Model, PDESpec
 
 
 @dataclass
 class LossWeights:
-    """Relative weights for the three loss terms."""
     pde: float = 1.0
-    ic: float = 1.0
-    bc: float = 1.0
+    constraints: float = 1.0     # single weight applied to the summed constraint loss
 
 
 @dataclass
 class LossTerms:
-    """Individual (unweighted) loss components + the weighted total, for logging."""
     total: torch.Tensor
     pde: torch.Tensor
-    ic: torch.Tensor
-    bc: torch.Tensor
+    constraints: torch.Tensor                       # summed constraint loss
+    per_constraint: dict = field(default_factory=dict)  # name -> loss (for logging)
 
 
-def burgers_loss(
+def pde_loss(
     model: Model,
-    xt_interior: torch.Tensor,
-    xt_ic: torch.Tensor,
-    u_ic: torch.Tensor,
-    xt_bc: torch.Tensor,
-    u_bc: torch.Tensor,
+    spec: PDESpec,
+    X_interior: torch.Tensor,
+    constraint_points: list[tuple[torch.Tensor, torch.Tensor]],
     weights: LossWeights = LossWeights(),
-    nu: float = NU_DEFAULT,
 ) -> LossTerms:
-    """Compute PDE + IC + BC MSE losses and the weighted total.
+    """Residual MSE (over all equation columns) + summed constraint MSE."""
+    residual = spec.residual(model, X_interior)             # (N, n_eqns)
+    loss_pde = residual.pow(2).mean()                       # mean over points AND equations
 
-    Returns a LossTerms bundle so the trainer can log each component separately
-    (the balance between terms is itself an object of study).
-    """
-    residual = pde_residual(model, xt_interior, nu=nu)
-    loss_pde = residual.pow(2).mean()
-    loss_ic = F.mse_loss(model(xt_ic), u_ic)
-    loss_bc = F.mse_loss(model(xt_bc), u_bc)
+    per = {}
+    for c, (Xc, target) in zip(spec.constraints, constraint_points):
+        pred = model(Xc)[:, list(c.components)]             # select constrained outputs
+        per[c.name] = F.mse_loss(pred, target)
+    loss_con = sum(per.values())
 
-    total = weights.pde * loss_pde + weights.ic * loss_ic + weights.bc * loss_bc
-    return LossTerms(total=total, pde=loss_pde, ic=loss_ic, bc=loss_bc)
+    total = weights.pde * loss_pde + weights.constraints * loss_con
+    return LossTerms(total=total, pde=loss_pde, constraints=loss_con, per_constraint=per)

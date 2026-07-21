@@ -1,0 +1,38 @@
+{
+  "heat": {
+    "bandwidth": 1,
+    "qapinn": 0.006,
+    "classical": 0.008,
+    "advantage": 0.002
+  },
+  "nu=0.1": {
+    "bandwidth": 3,
+    "qapinn": 0.049,
+    "classical": 0.018,
+    "advantage": -0.031
+  },
+  "nu=0.05": {
+    "bandwidth": 5,
+    "qapinn": 0.077,
+    "classical": 0.032,
+    "advantage": -0.045
+  },
+  "nu=0.02": {
+    "bandwidth": 10,
+    "qapinn": 0.165,
+    "classical": 0.069,
+    "advantage": -0.095
+  },
+  "nu=0.01": {
+    "bandwidth": 15,
+    "qapinn": 0.354,
+    "classical": 0.141,
+    "advantage": -0.214
+  },
+  "nu=0.003 (base)": {
+    "bandwidth": 22,
+    "qapinn": 0.472,
+    "classical": 0.535,
+    "advantage": 0.063
+  }
+}

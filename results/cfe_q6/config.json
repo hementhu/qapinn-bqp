@@ -1,0 +1,32 @@
+{
+  "name": "cfe_q6",
+  "num_params": 147,
+  "architecture": {
+    "type": "cfe",
+    "width": 6,
+    "post": [
+      6,
+      16,
+      1
+    ],
+    "num_params": 147
+  },
+  "raw": {
+    "name": "cfe_q6",
+    "model": "cfe",
+    "width": 6,
+    "post_hidden": [
+      16
+    ],
+    "pde": "burgers",
+    "n_interior": 1500,
+    "n_constraint": 150,
+    "adam_iters": 2000,
+    "adam_lr": 0.01,
+    "lbfgs_iters": 0,
+    "seed": 0,
+    "log_every": 100,
+    "probe_every": 25,
+    "checkpoint_every": 500
+  }
+}

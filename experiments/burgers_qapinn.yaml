@@ -1,0 +1,27 @@
+# QAPINN (ref [3]) on Burgers: VQC first hidden layer -> classical post-net.
+# The four VQC knobs are the Week-3 ablation axes (vary ONE at a time).
+name: burgers_qapinn
+pde: burgers
+model: qapinn
+
+vqc:
+  n_qubits: 4
+  n_layers: 3                   # re-upload / ansatz depth == Fourier bandwidth
+  reupload: true
+  entanglement: linear          # none | linear | ring | all_to_all
+  measurement: multi            # single | multi | zz
+  input_scale: 1.0
+post_hidden: [16]               # classical post-net: vqc_out -> 16 -> 1
+
+# training (L-BFGS off: closures x quantum-sim cost are prohibitive)
+n_interior: 1500
+n_constraint: 150
+adam_iters: 2000
+adam_lr: 1.0e-2
+lbfgs_iters: 0
+seed: 0
+log_every: 100
+
+# monitoring
+probe_every: 25
+checkpoint_every: 500

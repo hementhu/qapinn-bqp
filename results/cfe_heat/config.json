@@ -1,0 +1,32 @@
+{
+  "name": "cfe_heat",
+  "num_params": 109,
+  "architecture": {
+    "type": "cfe",
+    "width": 4,
+    "post": [
+      4,
+      16,
+      1
+    ],
+    "num_params": 109
+  },
+  "raw": {
+    "name": "cfe_heat",
+    "model": "cfe",
+    "width": 4,
+    "post_hidden": [
+      16
+    ],
+    "pde": "heat",
+    "n_interior": 1500,
+    "n_constraint": 150,
+    "adam_iters": 2000,
+    "adam_lr": 0.01,
+    "lbfgs_iters": 0,
+    "seed": 0,
+    "log_every": 100,
+    "probe_every": 25,
+    "checkpoint_every": 500
+  }
+}

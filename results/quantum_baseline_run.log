@@ -1,2 +1,0 @@
-[quantum_baseline] model=quantum params=29
-[quantum_baseline] DONE rel_L2=9.424e-01 final_total=3.706e-01 time=1395s -> results\quantum_baseline

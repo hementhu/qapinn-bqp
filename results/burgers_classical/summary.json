@@ -1,0 +1,33 @@
+{
+  "rel_l2": 0.4325602714302359,
+  "final_total": 0.07516736537218094,
+  "final_pde": 0.029872823506593704,
+  "final_constraints": 0.045294541865587234,
+  "train_time_s": 19.16980970000077,
+  "num_params": 121,
+  "config": {
+    "pde": "burgers",
+    "n_interior": 1500,
+    "n_constraint": 150,
+    "adam_iters": 2000,
+    "adam_lr": 0.01,
+    "lbfgs_iters": 0,
+    "w_pde": 1.0,
+    "w_constraints": 1.0,
+    "seed": 0,
+    "log_every": 100,
+    "eval_nx": 256,
+    "eval_nt": 100,
+    "probe_every": 25,
+    "checkpoint_every": 500
+  },
+  "architecture": {
+    "type": "classical",
+    "layers": [
+      2,
+      7,
+      11,
+      1
+    ]
+  }
+}

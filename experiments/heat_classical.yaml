@@ -1,0 +1,17 @@
+# Classical PINN on heat (smooth, single-mode control).
+name: heat_classical
+pde: heat
+model: classical
+layers: [2, 7, 11, 1]           # 121 params = QAPINN (matched-parameter control)
+
+# matched to heat_qapinn: same points/iters/optimizer/lr, Adam-only
+n_interior: 1500
+n_constraint: 150
+adam_iters: 2000
+adam_lr: 1.0e-2
+lbfgs_iters: 0
+seed: 0
+log_every: 100
+
+probe_every: 25
+checkpoint_every: 500
