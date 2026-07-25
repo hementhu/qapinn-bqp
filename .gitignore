@@ -28,3 +28,5 @@ report/project_journal.pdf
 Thumbs.db
 .vscode/
 .idea/
+.venv/
+laptop2_run.log
