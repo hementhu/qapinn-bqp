@@ -11,6 +11,9 @@ results/**/*.ckpt
 results/**/*.npz
 results/**/checkpoints/
 *.mat
+# EXCEPTION: keep the converged-core model weights (tiny, ~KB) so analysis that
+# needs weights (e.g. mechanism study) works across both laptops.
+!results/cv_*/model.pt
 
 # LaTeX build artifacts (keep the .tex, drop the junk)
 *.aux
