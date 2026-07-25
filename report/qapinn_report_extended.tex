@@ -33,20 +33,23 @@ A Spectral and Mechanistic Study \\[2pt] \large (Extended / Working Report with 
 
 \begin{abstract}
 This is the extended working version of the QAPINN-BQP report. It contains the
-full technical content of the submission draft --- a verified parameter-matched
-test bench, a five-dimension explainability suite, and a Tier-1 ablation on
-Burgers --- and additionally documents the \emph{complete experimental roadmap},
-the statistical work required to promote our current single-seed hypotheses to
-claims, and an explicit account of everything currently \emph{left out} of scope.
-Headline hypotheses (single seed, one undertrained PDE): a QAPINN's advantage
-tracks the frequency-setting knobs (depth, qubits, encoding scale), not
-\emph{entanglement} at fixed band; and against a structurally-identical
-classical-front-end control the advantage is \emph{bandwidth-gated} while the
-apparent classical-side effects (neuron diversity, gradient amplification) do
-\emph{not} survive --- what remains is a bandwidth-gated advantage and a
-barren-plateau signature in qubit count. The pipeline is independently verified
-(8/8 checks); the conclusions are
-not yet, and the path to establishing them is the subject of Sections
+full technical content of the submission draft, an \emph{adversarial self-audit}
+that corrected our initial over-claims, the \emph{converged re-analysis} that the
+audit forced, and an explicit account of everything still \emph{left out} of scope.
+The narrative arc is honest and worth stating plainly. An initial single-seed
+ablation suggested a ``bandwidth-gated advantage''; the audit then showed those
+runs were \emph{undertrained} (L-BFGS disabled; every Burgers model stuck at
+rel-$L_2\approx0.47$), so we re-ran a converged core (L-BFGS on, three seeds).
+The converged results give two firm findings: \textbf{(1) no quantum advantage} ---
+at matched parameters the classical PINN ($0.248\pm0.031$) beats every QAPINN, the
+best of which (depth-5, $0.314$) only ties a classical-front-end control ($0.315$);
+and \textbf{(2) entanglement significantly \emph{hurts} at convergence} ($0.369$ vs
+$0.424$ without vs with, $p\approx0.01$, $n=3$), inverting the field's
+``entanglement-driven expressibility'' expectation. We also correct the
+``band $=$ depth'' framing (verified for the VQC \emph{features}, but the tanh
+post-net escapes the band). The pipeline is independently verified (8/8 checks) and
+every number matches its raw log; the remaining roadmap (mechanism, larger-model
+regime, more seeds, real CFD) is the subject of Sections
 \ref{sec:roadmap}--\ref{sec:leftout}.
 \end{abstract}
 
@@ -132,6 +135,11 @@ to the re-upload depth.
 
 % ===========================================================================
 \section{Experiments and Results}
+\emph{Caveat (read first): the single-seed ablations in this section were run with
+L-BFGS disabled and are \textbf{undertrained} (Burgers models near rel-$L_2\,0.47$,
+shock unresolved). The converged re-analysis in Section~\ref{sec:converged}
+supersedes them; they are kept for transparency and to document the arc.}
+
 \subsection{Baseline and spectra}
 At 121 matched params (Adam, 2000 iters, seed 0): heat solved by both (classical
 $8.3\!\times\!10^{-3}$, QAPINN $5.9\!\times\!10^{-3}$); Burgers undertrained
@@ -305,60 +313,119 @@ barren-plateau signature --- the classical-side ``mechanism'' is not a clean eff
   \label{fig:classical}
 \end{figure}
 
+\subsection{Converged Re-analysis (Post-Audit)}\label{sec:converged}
+The ablations above were run with L-BFGS \emph{disabled} (Adam 2000, 1500 points).
+An adversarial audit established that this left every Burgers model undertrained
+(rel-$L_2\approx0.42$--$0.57$, shock unresolved), so the ``differences'' were
+movements inside a failed basin and, across six seeds, within initialisation noise.
+\textbf{The results here supersede them.} We re-ran a converged core with L-BFGS
+\emph{on} (Adam 2500 $+$ L-BFGS 400, 4000 points), three seeds each, on Burgers.
+
+\begin{table}[h]\centering\small
+\begin{tabular}{llcc l}
+\toprule
+config & model & params & rel-$L_2$ ($n{=}3$) & note \\ \midrule
+cv\_cls      & classical    & 121 & $\mathbf{0.248 \pm 0.031}$ & \textbf{best of all} \\
+cv\_qd5\_lin & QAPINN d5    & 137 & $0.314 \pm 0.073$ & depth helps; ties CFE \\
+cv\_cfe      & CFE control  & 109 & $0.315 \pm 0.026$ & classical front-end \\
+cv\_qd3\_none& QAPINN d3    & 121 & $0.369 \pm 0.022$ & \textbf{no-ent beats linear} \\
+cv\_qd3\_lin & QAPINN d3    & 121 & $0.424 \pm 0.005$ & reference QAPINN \\
+\bottomrule
+\end{tabular}
+\caption{Converged core. L-BFGS roughly halved every error vs.\ undertrained
+(classical $0.535\!\to\!0.248$); at matched params the classical PINN wins.}
+\label{tab:converged}
+\end{table}
+
+\emph{Finding 1 --- no quantum advantage:} converged and matched, the classical PINN
+($0.248$) beats every QAPINN; the best (depth-5, $0.314$) only reaches the CFE
+control. \emph{Finding 2 --- entanglement hurts at convergence:} none $0.369$ vs
+linear $0.424$ ($t\approx4.3$, $p\approx0.01$, $n=3$, ranges disjoint) --- opposite
+sign to the field's expectation and to the undertrained sweep's ``within noise''.
+\emph{Framing correction:} ``band $=$ depth'' is verified for the VQC features
+($L{=}1..6$) but the tanh post-net escapes the band (a depth-3 model reaches
+$k{=}22$ once trained), so the earlier ``$k\approx3$ band edge'' was an undertraining
+artifact; the ``barren-plateau in qubit count'' is withdrawn (wrong gradient
+measured, non-monotone trend).
+
 \subsection{Discussion}
-The evidence is coherent: the quantum layer's behaviour is a \emph{bandwidth}
-phenomenon (tracks depth/qubits/scale, not entanglement at fixed band, needs but is
-not subsumed by a classical readout, holds up to a trainability ceiling). Against a
-fair control the advantage is \emph{bandwidth-gated} and the apparent classical-side
-mechanism does \emph{not} survive --- what remains is a bandwidth-gated advantage
-and a barren-plateau signature in qubit count.
+With the converged core in hand the reading is one-directional: for this small-model
+Burgers task the quantum layer offers \emph{no} accuracy advantage, and its one
+clearly quantum-specific knob --- entanglement --- \emph{hurts} at convergence. The
+``bandwidth'' story survives only weakly (more depth $=$ richer features, not a hard
+model-band limit, and no advantage over a matched classical net). The value is
+methodological and negative-with-attribution: verified pipeline, matched and
+structurally-matched controls, multi-seed statistics, and an audit that caught our
+own over-claims.
 
 % ===========================================================================
 \section{Current Limitations}
-Hypotheses, not claims: (1) single seed --- pairwise gaps ($\sim$7\%) are within
-plausible init noise; (2) undertrained, one PDE (Burgers $0.42$--$0.57$); (3) a
-structural confound in the diversity comparison (16 vs 30 neurons), mitigated by
-the fixed-post-net depth sweep; (4) simulation only (no shot noise / hardware).
-Code verified; conclusions not yet.
+The converged findings (Section~\ref{sec:converged}) are firm in direction but
+bounded: (1) \textbf{modest $n$} --- three seeds (enough for entanglement at
+$p\approx0.01$; five would firm it up); (2) \textbf{small-model regime} --- at 121
+params even converged models sit at rel-$L_2$ $0.25$--$0.42$, the shock better but
+not fully resolved, so orderings could shift with larger nets; (3) \textbf{mechanism
+not isolated} --- we have the ``entanglement hurts'' number but not a verified
+\emph{why}; (4) \textbf{one PDE, simulation only} (no shot noise / hardware);
+parameter reduction is not resource reduction. The pre-convergence single-seed
+ablations are retained for transparency but are superseded. Pipeline verified; every
+number matches its log.
 
 % ===========================================================================
 \section{Future Work and Experimental Roadmap}
 \label{sec:roadmap}
-The single most important next step follows from the ``undertrained'' limitation:
-\emph{establish convergence before spending compute on statistics.} The revised
-priority order is therefore convergence, then seeds, then breadth.
+Tiers 2a--2c below were the top priorities of the earlier draft; \textbf{they are now
+done}, and their outcomes (Section~\ref{sec:converged}) are what reshaped the report.
+We record them as completed, then give the genuinely open roadmap.
 
-\subsection{Tier 2a --- Convergence / iteration analysis (highest priority)}
-Because all current results are undertrained, every ordering may be a transient.
-Iterations is nearly free as an ablation: checkpoints and the loss history from a
-single long run yield every iteration point. Plan: long-train the headline
-configs (baseline QAPINN, entanglement-none QAPINN, matched classical) to
-$\sim$8000 iters with dense checkpoints, and re-evaluate all metrics
-(accuracy, realised spectrum, entanglement, classical-side diversity/gradients)
-along the trajectory. Questions: do the depth and entanglement orderings persist
-at convergence? Does the slower-training QAPINN (its $k{=}1$ error halves at
-iter 550 vs 75 for classical) catch up, plateau higher, or overtake? Do the
-classical-side effects grow or fade? Cost: $\sim$5\,h.
+\subsection{Tier 2a --- Convergence analysis \textnormal{(\textbf{done})}}
+Long-training the headline configs to $\sim$8000 iters, then the full converged core
+(L-BFGS on, 3 seeds), \emph{answered} the central worry: the undertrained orderings
+were transients. Convergence roughly halved every error and \emph{flipped} the
+entanglement result from ``within noise'' to ``significantly harmful'', while the
+QAPINN's accuracy advantage over a matched classical net \emph{disappeared}. This is
+the single most important result in the report.
 
-\subsection{Tier 2b --- Multi-seed robustness (error bars)}
-Re-run the surviving headline configs across 3--5 seeds to obtain mean $\pm$ std,
-and accept a difference only if it exceeds the seed spread. Priority: the
-entanglement-does-not-help result (publishable if it survives) and the
-classical-side diversity/gradient effects. Cost: $\sim$10\,h.
+\subsection{Tier 2b --- Multi-seed robustness \textnormal{(\textbf{done})}}
+The entanglement effect now carries error bars: none $0.369\pm0.022$ vs linear
+$0.424\pm0.005$ over three seeds ($p\approx0.01$), and the seven-seed \emph{undertrained}
+sweep confirmed the earlier ``within noise'' reading was a budget artifact. Five-plus
+seeds on the converged core remains a cheap firming-up step.
 
-\subsection{Tier 2c --- The classical-front-end control}
-To remove the last confound from the ``diversity'' finding, add a control with an
-\emph{identical} post-net but a classical $2\!\to\!4$ front-end, and compare its
-post-net directly to the QAPINN's. This isolates ``quantum vs classical front-end
-effect on the same classical net.'' Cost: negligible (classical).
+\subsection{Tier 2c --- The classical-front-end control \textnormal{(\textbf{done})}}
+The CFE (identical post-net, classical $2\!\to\!4$ front end) was built and run both
+undertrained and converged. It \emph{refuted} the ``quantum diversifies the classical
+neurons'' claim (diversity inconsistent across knobs; the earlier effect was a
+mismatched-control artifact) and, converged, \emph{ties} the best QAPINN --- direct
+evidence of no quantum advantage.
 
-\subsection{Tier 3 --- Remaining ablation axes and the bandwidth continuum}
+\subsection{Tier 2d --- The genuinely open work (now the priorities)}
 \begin{itemize}[nosep]
-  \item \textbf{$\nu$-sweep (bandwidth continuum):} tune Burgers viscosity from
-  smooth to sharp and plot advantage vs solution bandwidth --- the continuum that
-  turns two discrete regularity points (heat, Burgers) into a scaling relation.
-  This directly tests whether bandwidth is a \emph{sufficient statistic} for
-  advantage.
+  \item \textbf{Mechanism of the entanglement harm (highest priority):} isolate
+  \emph{why} entanglement hurts --- compare the converged \texttt{cv\_qd3\_none} and
+  \texttt{cv\_qd3\_lin} per-qubit feature spectra, their pairwise correlation, and the
+  post-net's effective rank. Hypothesis: entanglement correlates the per-qubit Fourier
+  features and constrains realisable coefficients (cf.\ Mhiri), giving the readout a
+  poorer, lower-rank basis while adding a trainability cost.
+  \item \textbf{Resolved (larger-model) regime:} repeat the converged core at
+  $\sim$2000 params (the size the original 8$\times$20 PINN used to reach $2.2\text{e-}3$)
+  to check whether ``classical wins / entanglement hurts'' holds once the shock is
+  actually resolved, or is a small-model artifact.
+  \item \textbf{Cross-PDE sign check:} does ``entanglement hurts'' hold on heat and on
+  other operators, or is it Burgers-specific?
+  \item \textbf{More seeds:} 5--8 on the converged core to tighten the $p$-value.
+\end{itemize}
+
+\subsection{Tier 3 --- Remaining ablation axes \textnormal{(largely done, single-seed)}}
+The $\nu$-sweep, qubit, measurement, and encoding-scale sweeps were all run (undertrained,
+single seed); their headline outcomes: \emph{$\nu$-sweep} --- error rises monotonically with
+bandwidth but the advantage is V-shaped, \emph{not} a clean collapse, and the depth-3 QAPINN
+loses to matched classical across the family; \emph{qubits} behave like depth; \emph{scale}
+$=2\pi$ collapses (aliasing). These now need converged, multi-seed repeats to be trusted.
+\begin{itemize}[nosep]
+  \item \textbf{$\nu$-sweep (bandwidth continuum, done):} tuning Burgers viscosity
+  turned two regularity points into a curve; it \emph{refuted} bandwidth as a
+  \emph{sufficient statistic} for advantage (V-shaped, not monotone).
   \item \textbf{Qubits} (3--6): more bandwidth + Hilbert space (changes params;
   needs re-matching + barren-plateau watch).
   \item \textbf{Measurement:} single / multi / ZZ, and the not-yet-implemented
@@ -437,14 +504,18 @@ For transparency, the present study explicitly does \emph{not} yet include:
 
 % ===========================================================================
 \section{Conclusion}
-We have a verified bench, a five-dimension XAI suite, and a coherent set of
-single-seed hypotheses: the quantum layer's behaviour is a bandwidth phenomenon
-(not entanglement). Against a structurally-identical classical-front-end control the
-advantage is bandwidth-gated, and the apparent classical-side mechanism does not
-survive --- what remains is a bandwidth-gated accuracy advantage and a
-barren-plateau signature in qubit count. The immediate next step is the convergence
-(Tier 2a) analysis, followed by multi-seed error bars (Tier 2b), after which the
-surviving hypotheses become claims and the design methodology can be validated.
+We have a verified bench, a five-dimension XAI suite, and --- crucially --- an
+adversarial self-audit that overturned our own initial reading. At convergence and
+matched parameters, the QAPINN offers \emph{no} accuracy advantage over a classical
+PINN, and its one clearly quantum-specific knob, \emph{entanglement}, significantly
+\emph{hurts} ($0.369$ vs $0.424$, $p\approx0.01$) --- the opposite of the field's
+default expectation. The ``VQC $=$ Fourier band $=$ depth'' fact is verified but
+governs the quantum features, not the full model. The honest contribution is a
+controlled negative plus one counter-intuitive positive finding, delivered with the
+controls, multi-seed statistics, and self-correction the QAPINN literature usually
+omits. The open work is to isolate the mechanism of the entanglement effect, confirm
+it in a resolved (larger-model) regime and across PDEs, and only then ask whether any
+design methodology is warranted.
 
 % ===========================================================================
 \begin{thebibliography}{9}
