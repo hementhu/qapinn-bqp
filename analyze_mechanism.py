@@ -116,12 +116,24 @@ def main():
               f"none feature max-harmonics per seed: {res['none']['harms']}",
               f"linear feature max-harmonics per seed: {res['linear']['harms']}",
               "",
-              "## Reading",
+              "## Reading (honest, n=3)",
               f"- Entanglement entropy: none={fmt('none','ent')} (~0 sanity check), "
-              f"linear={fmt('linear','ent')} (genuinely entangled).",
-              "- If linear shows HIGHER feature correlation and LOWER feature/post eff-rank "
-              "than none, the hypothesis holds: entanglement redundifies the per-qubit "
-              "features, giving the post-net a poorer basis -> worse fit.", ""]
+              f"linear={fmt('linear','ent')} (genuinely entangled) -- as expected.",
+              f"- **Accuracy effect is solid:** none {fmt('none','rel')} vs linear "
+              f"{fmt('linear','rel')} (p~0.01, separate analysis). WHY is the open part.",
+              "- **Feature-redundancy hypothesis: only partially supported.** "
+              "Entanglement raises the per-qubit feature correlation (none 0.28 -> "
+              "linear 0.44), the direction predicted -- but linear's seed spread is large "
+              "(+/-0.26) so the bars overlap. Post-net effective rank is slightly lower "
+              "with entanglement (4.76 vs 5.12), also the predicted direction but "
+              "overlapping. The raw VQC-feature rank goes the OTHER way (linear higher), "
+              "confounded by dead/near-constant channels in the unentangled model.",
+              "- **Verdict:** the 'entanglement redundifies the readout's feature basis' "
+              "story is *directionally consistent* (correlation up, post-net rank down) "
+              "but NOT statistically clean at n=3 -- one of three metrics is confounded and "
+              "all error bars overlap. The accuracy harm is real; a confirmed mechanism "
+              "needs more seeds and a dead-channel-robust rank measure. We report this as "
+              "a supported-but-unconfirmed hypothesis, not a result.", ""]
     Path("report/mechanism.md").write_text("\n".join(lines), encoding="utf-8")
     print("\n".join(lines))
 
