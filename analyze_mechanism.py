@@ -28,9 +28,20 @@ SEEDS = (0, 1, 2)
 CONFIGS = {"none": "cv_qd3_none", "linear": "cv_qd3_lin"}
 
 
-def eff_rank(A: np.ndarray) -> float:
-    """Entropy-based effective rank of columns of A (n_points x d)."""
+def eff_rank(A: np.ndarray, drop_dead: bool = True) -> float:
+    """Entropy-based effective rank of columns of A (n_points x d).
+
+    drop_dead: exclude near-constant channels (std < 1% of the max column std)
+    before the SVD, so a model with dead/flat feature channels is not unfairly
+    credited with (or penalised on) rank. This removes the dead-channel confound
+    that made the raw VQC-feature rank misleading for the unentangled model.
+    """
     A = A - A.mean(0, keepdims=True)
+    if drop_dead and A.shape[1] > 1:
+        sd = A.std(0)
+        keep = sd > 0.01 * sd.max()
+        if keep.sum() >= 1:
+            A = A[:, keep]
     s = np.linalg.svd(A, compute_uv=False)
     s = s[s > 1e-12]
     if s.size == 0:
@@ -121,19 +132,20 @@ def main():
               f"linear={fmt('linear','ent')} (genuinely entangled) -- as expected.",
               f"- **Accuracy effect is solid:** none {fmt('none','rel')} vs linear "
               f"{fmt('linear','rel')} (p~0.01, separate analysis). WHY is the open part.",
-              "- **Feature-redundancy hypothesis: only partially supported.** "
-              "Entanglement raises the per-qubit feature correlation (none 0.28 -> "
-              "linear 0.44), the direction predicted -- but linear's seed spread is large "
-              "(+/-0.26) so the bars overlap. Post-net effective rank is slightly lower "
-              "with entanglement (4.76 vs 5.12), also the predicted direction but "
-              "overlapping. The raw VQC-feature rank goes the OTHER way (linear higher), "
-              "confounded by dead/near-constant channels in the unentangled model.",
-              "- **Verdict:** the 'entanglement redundifies the readout's feature basis' "
-              "story is *directionally consistent* (correlation up, post-net rank down) "
-              "but NOT statistically clean at n=3 -- one of three metrics is confounded and "
-              "all error bars overlap. The accuracy harm is real; a confirmed mechanism "
-              "needs more seeds and a dead-channel-robust rank measure. We report this as "
-              "a supported-but-unconfirmed hypothesis, not a result.", ""]
+              "- **Feature-redundancy hypothesis: NOT confirmed -- the metrics conflict.** "
+              "Entanglement raises per-qubit feature correlation (none 0.28 -> linear 0.44, "
+              "the predicted direction, but with large seed spread +/-0.26). However the VQC "
+              "feature effective rank *also* rises with entanglement (2.54 -> 3.15), the "
+              "OPPOSITE of the 'poorer basis' prediction -- and this survives dropping dead "
+              "channels, so it is real variance structure, not an artifact. Post-net hidden "
+              "rank is essentially a wash (5.12 vs 4.76, overlapping).",
+              "- **Verdict:** we do NOT have a confirmed representational mechanism. One "
+              "metric supports 'poorer basis' (correlation up), one contradicts it (rank up), "
+              "one is neutral. The accuracy harm (entanglement hurts, p~0.01) is real, but "
+              "*why* remains open. The conflict suggests the cause may be **trainability** "
+              "(entanglement roughens the loss landscape / adds optimization cost) rather "
+              "than a poorer feature basis -- a hypothesis the larger-model + landscape "
+              "follow-up is designed to probe. Reported honestly as an open question.", ""]
     Path("report/mechanism.md").write_text("\n".join(lines), encoding="utf-8")
     print("\n".join(lines))
 
