@@ -1,0 +1,33 @@
+{
+  "name": "big_cls_s0",
+  "num_params": 1273,
+  "architecture": {
+    "type": "classical",
+    "layers": [
+      2,
+      16,
+      68,
+      1
+    ]
+  },
+  "raw": {
+    "name": "big_cls_s0",
+    "model": "classical",
+    "layers": [
+      2,
+      16,
+      68,
+      1
+    ],
+    "pde": "burgers",
+    "n_interior": 6000,
+    "n_constraint": 150,
+    "adam_iters": 3000,
+    "adam_lr": 0.01,
+    "lbfgs_iters": 600,
+    "seed": 0,
+    "log_every": 100,
+    "probe_every": 25,
+    "checkpoint_every": 0
+  }
+}
