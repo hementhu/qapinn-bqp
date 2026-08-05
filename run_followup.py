@@ -68,11 +68,26 @@ def big_classical_configs():
     return [_seeded(c, s, BIG) for s in BIG_SEEDS]
 
 
+CONFIRM_SEEDS = (3, 4, 5)   # extend the larger-model core to n=6
+
+
+def _big_classical_seeds(seeds):
+    p = _big_params()
+    c = classical_cfg(p); c["name"] = "big_cls"
+    return [_seeded(c, s, BIG) for s in seeds]
+
+
 def slice_configs(name):
     if name == "laptop1":
         return mech_configs() + big_classical_configs()
     if name == "laptop2":
         return big_quantum_configs()
+    # n=6 confirmation of the larger-model result (seeds 3-5):
+    if name == "laptop1c":   # no-entanglement quantum (3) + all classical (fast)
+        return ([_seeded(_big_qd3("none", "none"), s, BIG) for s in CONFIRM_SEEDS]
+                + _big_classical_seeds(CONFIRM_SEEDS))
+    if name == "laptop2c":   # linear-entanglement quantum (3)
+        return [_seeded(_big_qd3("linear", "lin"), s, BIG) for s in CONFIRM_SEEDS]
     return mech_configs() + big_classical_configs() + big_quantum_configs()
 
 
