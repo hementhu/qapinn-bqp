@@ -13,8 +13,22 @@ Authoritative `rel_l2` / `num_params` from each run's `summary.json`. `train` = 
 | cv_qd3_none | QAPINN | 121 | 0.369 ± 0.022 | **no-entanglement beats linear** |
 | cv_qd3_lin | QAPINN | 121 | 0.424 ± 0.005 | reference QAPINN — worst |
 
-**Entanglement HURTS at convergence:** none 0.369 vs linear 0.424 (Δ=+0.056, t≈4, p≈0.01, n=3) — inverts the field's 'entanglement=expressibility' intuition.  
-**No quantum advantage:** classical (0.248) beats every QAPINN; best QAPINN (depth-5, 0.314) only reaches the CFE control (0.315).
+**No quantum advantage (small model):** classical (0.248) beats every QAPINN; best QAPINN (depth-5, 0.314) only reaches the CFE control (0.315).  
+**Entanglement effect NOT robust:** at n=3 none (0.369) beat linear (0.424) with p≈0.02 -- but this DEFLATED at n=6 (p=0.41). A lucky 3-seed draw; retracted. See §0b for the larger-model test.
+
+## 0b. Larger-model regime (~1273 params, L-BFGS on) + FAIR controls -- THE DECIDER
+*The small-model (121p) comparison was between failing models. This repeats it at a resolved scale, AND against fair controls (structural CFE + a depth-matched classical). Result: the apparent quantum advantage over a shallow classical net does NOT survive a fairly-chosen (deeper) classical baseline.*
+
+| config | model | rel-L2 (mean ± std) | vs QAPINN-none |
+|---|---|---|---|
+| big_qd3_none | QAPINN (no ent) | **0.094 ± 0.075** (n=6) | best (but see below) |
+| big_qd3_lin | QAPINN (linear) | 0.128 ± 0.056 (n=6) | p=0.44 (n.s.) |
+| big_cls_deep | classical [2,22,22,22,1] | 0.133 ± 0.047 (n=6) | **p=0.35 (n.s.) -- ties QAPINN** |
+| big_cfe | structural control | 0.173 ± 0.048 (n=6) | p=0.076 (marginal) |
+| big_cls_bal | classical [2,32,32,1] | 0.231 ± 0.026 (n=3) | p=0.03 |
+| big_cls | classical [2,16,68,1] shallow | 0.241 ± 0.037 (n=6) | p=0.003 |
+
+**Verdict:** QAPINN beats a *shallow* classical (p=0.003) but a *depth-matched* classical net ties it (0.133 vs 0.094, p=0.35). The advantage is ARCHITECTURAL (depth/post-net width), reproducible classically -- NOT quantum-specific. Entanglement: none vs linear p=0.44 (n.s.).
 
 ## 1. Base comparison (matched 121 params, undertrained A2000)
 *Heat (smooth, single mode) fits well; Burgers (shock) does not, for either model.*
@@ -154,8 +168,9 @@ Authoritative `rel_l2` / `num_params` from each run's `summary.json`. `train` = 
 | VQC features = Fourier, band = depth | **robust** | proven + verified L=1..6 (isolated qubit) |
 | input_scale 2π collapse = aliasing | **robust** | verified (max harmonic → Nyquist) |
 | Heat (in-band) fits; sharp Burgers doesn't at small budget | **robust** | consistent everywhere |
-| **Entanglement HURTS at convergence** | **robust (new)** | 3 seeds, p≈0.01 (§0) |
-| No quantum advantage at matched params | **robust (new)** | classical beats all QAPINN converged (§0) |
+| Entanglement hurts at convergence | **REFUTED at n=6** | p=0.02 at n=3 -> p=0.41 at n=6 (lucky draw) |
+| No quantum advantage vs FAIR classical baseline | **robust** | depth-matched classical ties QAPINN (p=0.35, §0b) |
+| Apparent large-model advantage is architectural | **robust** | reproducible by a deeper classical net (§0b) |
 | Capacity fixes the shock | refuted | classical error non-monotonic in params (§8) |
 | 'band = depth' limits the FULL model | **refuted (category error)** | depth-3 reaches k22 with training |
 | Depth 'monotonically' helps | overstated | single-seed; some steps within noise |
