@@ -91,13 +91,20 @@ classical network it is attached to.
 \begin{enumerate}[nosep]
   \item A verified, parameter-matched, PDE-agnostic bench (Burgers + heat, exact
   references) and a five-dimension XAI suite (spectral / F-principle, neurons,
-  VQC internals, loss landscape, generalisation).
-  \item An empirical confirmation, on our own implementation, that the VQC is a
-  truncated Fourier series whose bandwidth equals the re-upload depth.
-  \item A Tier-1 ablation (depth, entanglement, post-net width) isolating whether
-  the advantage is a bandwidth effect or an entanglement effect.
-  \item A classical-side analysis quantifying how the quantum layer changes the
-  downstream classical network's neurons, weights, and gradient dynamics.
+  VQC internals, loss landscape, generalisation), with an empirical confirmation
+  that the VQC is a truncated Fourier series whose bandwidth equals the re-upload
+  depth (of the \emph{features}, not the post-net-filtered model).
+  \item A converged, multi-seed comparison at two model scales against three
+  control types (parameter-matched, structurally-matched, and depth-matched),
+  finding \textbf{no statistically significant quantum-specific advantage} on 1-D
+  Burgers.
+  \item An adversarial self-audit that overturned three of our own initial
+  over-claims (a classical-side ``diversity'' mechanism, an ``entanglement hurts''
+  effect, and a resolved-scale ``advantage''), each dissolving under the appropriate
+  fair control.
+  \item The transferable deliverable: a four-gate \emph{falsification protocol} for
+  claimed QAPINN advantages (convergence, fair controls, multi-seed significance,
+  features-vs-model), distilled from those retractions.
 \end{enumerate}
 
 % ===========================================================================
@@ -238,14 +245,17 @@ while the matched classical net stays flat ($\sim$0.50--0.53). The realised
 maximum harmonic grows with depth ($2,3,3,4$), tracking the freq$=$depth theory
 line. A \emph{crossover} appears near depth~2: below it the QAPINN is
 comparable-or-worse than the equal-parameter classical net; at depth~$\geq3$ it
-pulls ahead. The advantage \emph{emerges with bandwidth}.
+pulls ahead. This \emph{apparent} bandwidth-gated advantage is single-seed and does
+\emph{not} survive convergence (Section~\ref{sec:converged}); we report it as the
+initial reading the audit later overturned.
 
 \paragraph{Entanglement (band fixed).} Holding depth fixed and varying the
 entangling pattern (Fig.~\ref{fig:ent}), accuracy barely moves ($0.456$--$0.488$)
 and \emph{more} entanglement is slightly \emph{worse}; zero entanglement is the
 best. The entanglement entropy swings from $0$ to $\sim$1 without tracking
-accuracy. This contradicts the ``entanglement-driven expressibility'' narrative:
-at fixed band, entanglement does not carry the advantage.
+accuracy. (Single-seed: a later 7-seed test showed these gaps are within noise, and
+the converged ``entanglement hurts'' follow-up was itself retracted at $n=6$ ---
+Section~\ref{sec:converged}. At no budget does entanglement \emph{help}.)
 
 \begin{figure}[t]
   \centering
@@ -389,12 +399,14 @@ black-hole trainability pathology, reproduced as an ablation.
   \label{fig:tier3}
 \end{figure}
 
-The five knobs split cleanly. \emph{Bandwidth} knobs (depth, qubits, encoding
-scale) carry the advantage --- but only up to a trainability ceiling, made concrete
-by the $2\pi$ collapse. \emph{Coefficient/readout} knobs (entanglement, correlator
-measurement) do not. This is the bandwidth-vs-trainability squeeze, observed across
-five independent knobs, strengthening the single-seed picture beyond any one
-pairwise comparison.
+The five knobs split cleanly at this (single-seed, undertrained) budget:
+\emph{bandwidth} knobs (depth, qubits, encoding scale) appear to carry the advantage
+--- but only up to a trainability ceiling, made concrete by the $2\pi$ collapse ---
+while \emph{coefficient/readout} knobs (entanglement, correlator measurement) do not.
+Of these, only the $2\pi$ collapse (a robust trainability pathology) survives the
+converged re-analysis; the ``bandwidth carries the advantage'' reading does not
+(Section~\ref{sec:converged}), and is reported here as the initial picture the audit
+corrected.
 
 \subsection{How the quantum layer changes the classical network}
 The central explainability question is what the quantum front-end does to the
