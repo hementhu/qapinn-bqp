@@ -40,16 +40,17 @@ The narrative arc is honest and worth stating plainly. An initial single-seed
 ablation suggested a ``bandwidth-gated advantage''; the audit then showed those
 runs were \emph{undertrained} (L-BFGS disabled; every Burgers model stuck at
 rel-$L_2\approx0.47$), so we re-ran a converged core (L-BFGS on, three seeds).
-The converged results give two firm findings: \textbf{(1) no quantum advantage} ---
-at matched parameters the classical PINN ($0.248\pm0.031$) beats every QAPINN, the
-best of which (depth-5, $0.314$) only ties a classical-front-end control ($0.315$);
-and \textbf{(2) entanglement significantly \emph{hurts} at convergence} ($0.369$ vs
-$0.424$ without vs with, $p\approx0.01$, $n=3$), inverting the field's
-``entanglement-driven expressibility'' expectation. We also correct the
-``band $=$ depth'' framing (verified for the VQC \emph{features}, but the tanh
-post-net escapes the band). The pipeline is independently verified (8/8 checks) and
-every number matches its raw log; the remaining roadmap (mechanism, larger-model
-regime, more seeds, real CFD) is the subject of Sections
+The converged results, taken to two model scales with fair controls, give a
+consistent negative. \textbf{(1) No quantum advantage:} at small scale the classical
+PINN ($0.248$) beats every QAPINN; at resolved scale ($\sim$1273 params) the QAPINN
+beats a \emph{shallow} classical ($0.094$ vs $0.24$, $p=0.003$) but \emph{ties} a
+depth-matched classical net ($0.133$, $p=0.35$), so the gain is architectural and
+classically reproducible. \textbf{(2) No robust entanglement effect:} an $n=3$
+``entanglement hurts'' signal ($p\approx0.02$) collapsed at $n=6$ ($p=0.41$) and is
+retracted. We also correct the ``band $=$ depth'' framing (verified for the VQC
+\emph{features}, but the tanh post-net escapes the band). The pipeline is
+independently verified (8/8 checks) and every number matches its raw log; the
+remaining roadmap (still-larger scale, more seeds, real CFD) is the subject of Sections
 \ref{sec:roadmap}--\ref{sec:leftout}.
 \end{abstract}
 
@@ -339,9 +340,14 @@ cv\_qd3\_lin & QAPINN d3    & 121 & $0.424 \pm 0.005$ & reference QAPINN \\
 
 \emph{Finding 1 --- no quantum advantage:} converged and matched, the classical PINN
 ($0.248$) beats every QAPINN; the best (depth-5, $0.314$) only reaches the CFE
-control. \emph{Finding 2 --- entanglement hurts at convergence:} none $0.369$ vs
-linear $0.424$ ($t\approx4.3$, $p\approx0.01$, $n=3$, ranges disjoint) --- opposite
-sign to the field's expectation and to the undertrained sweep's ``within noise''.
+control. \emph{Finding 2 --- larger-model + fair controls (the decider):} repeating
+the core at $\sim$1273 params ($n=6$) against a structural control and a
+depth-matched classical net, the QAPINN-none ($0.094$) beats a shallow classical
+($0.241$, $p=0.003$) but \emph{ties} a depth-matched classical ($0.133$, $p=0.35$)
+and only marginally leads the CFE ($0.173$, $p=0.076$): no significant quantum
+advantage against a fair baseline. \emph{Finding 3 --- entanglement not robust:} the
+$n=3$ ``entanglement hurts'' result ($0.369$ vs $0.424$, $p\approx0.02$) collapsed at
+$n=6$ ($p=0.41$) and is retracted; at large scale the gap is likewise n.s.\ ($p=0.44$).
 \emph{Framing correction:} ``band $=$ depth'' is verified for the VQC features
 ($L{=}1..6$) but the tanh post-net escapes the band (a depth-3 model reaches
 $k{=}22$ once trained), so the earlier ``$k\approx3$ band edge'' was an undertraining
@@ -399,21 +405,20 @@ neurons'' claim (diversity inconsistent across knobs; the earlier effect was a
 mismatched-control artifact) and, converged, \emph{ties} the best QAPINN --- direct
 evidence of no quantum advantage.
 
-\subsection{Tier 2d --- The genuinely open work (now the priorities)}
+\subsection{Tier 2d --- Larger-model + mechanism \textnormal{(\textbf{done}; both deflated)}}
 \begin{itemize}[nosep]
-  \item \textbf{Mechanism of the entanglement harm (highest priority):} isolate
-  \emph{why} entanglement hurts --- compare the converged \texttt{cv\_qd3\_none} and
-  \texttt{cv\_qd3\_lin} per-qubit feature spectra, their pairwise correlation, and the
-  post-net's effective rank. Hypothesis: entanglement correlates the per-qubit Fourier
-  features and constrains realisable coefficients (cf.\ Mhiri), giving the readout a
-  poorer, lower-rank basis while adding a trainability cost.
-  \item \textbf{Resolved (larger-model) regime:} repeat the converged core at
-  $\sim$2000 params (the size the original 8$\times$20 PINN used to reach $2.2\text{e-}3$)
-  to check whether ``classical wins / entanglement hurts'' holds once the shock is
-  actually resolved, or is a small-model artifact.
-  \item \textbf{Cross-PDE sign check:} does ``entanglement hurts'' hold on heat and on
-  other operators, or is it Burgers-specific?
-  \item \textbf{More seeds:} 5--8 on the converged core to tighten the $p$-value.
+  \item \textbf{Resolved (larger-model) regime \textnormal{(done):}} we repeated the
+  core at $\sim$1273 params ($n=6$) against a structural control (CFE) \emph{and} a
+  depth-matched classical net. The QAPINN beats a shallow classical ($0.094$ vs
+  $0.24$, $p=0.003$) but \emph{ties} the depth-matched classical ($0.133$, $p=0.35$):
+  the advantage is architectural, not quantum-specific. This is the decisive result.
+  \item \textbf{Entanglement mechanism \textnormal{(done; moot):}} we measured feature
+  correlation and effective rank for \texttt{cv\_qd3\_none} vs \texttt{cv\_qd3\_lin}.
+  The metrics conflicted (correlation rose with entanglement but so did feature rank),
+  and --- more importantly --- the entanglement \emph{effect} itself did not survive seed
+  expansion (§Finding~3), so there was no robust effect left to explain.
+  \item \textbf{Still open:} still-larger scale, $5$--$8$ seeds throughout, and a
+  cross-PDE check --- none of which is expected to overturn the negative, but any could.
 \end{itemize}
 
 \subsection{Tier 3 --- Remaining ablation axes \textnormal{(largely done, single-seed)}}
@@ -505,17 +510,18 @@ For transparency, the present study explicitly does \emph{not} yet include:
 % ===========================================================================
 \section{Conclusion}
 We have a verified bench, a five-dimension XAI suite, and --- crucially --- an
-adversarial self-audit that overturned our own initial reading. At convergence and
-matched parameters, the QAPINN offers \emph{no} accuracy advantage over a classical
-PINN, and its one clearly quantum-specific knob, \emph{entanglement}, significantly
-\emph{hurts} ($0.369$ vs $0.424$, $p\approx0.01$) --- the opposite of the field's
-default expectation. The ``VQC $=$ Fourier band $=$ depth'' fact is verified but
+adversarial self-audit that repeatedly overturned our own readings. Across two model
+scales, three control types (matched, structural, depth-matched), and multi-seed
+statistics, the QAPINN offers \emph{no statistically significant} advantage over a
+fairly-chosen classical baseline: at small scale classical wins, at resolved scale a
+depth-matched classical net ties the QAPINN, and no robust entanglement effect
+survives seed expansion. The ``VQC $=$ Fourier band $=$ depth'' fact is verified but
 governs the quantum features, not the full model. The honest contribution is a
-controlled negative plus one counter-intuitive positive finding, delivered with the
-controls, multi-seed statistics, and self-correction the QAPINN literature usually
-omits. The open work is to isolate the mechanism of the entanglement effect, confirm
-it in a resolved (larger-model) regime and across PDEs, and only then ask whether any
-design methodology is warranted.
+rigorous negative and the methodology behind it --- three apparent advantages each
+dissolved under the appropriate fair control, and each would have been a false
+positive without it. The open work is to test still-larger scale, more seeds, and
+other PDEs before asking whether any quantum-specific advantage --- or design
+methodology --- is warranted.
 
 % ===========================================================================
 \begin{thebibliography}{9}

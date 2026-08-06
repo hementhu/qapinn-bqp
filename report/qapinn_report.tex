@@ -46,23 +46,25 @@ one-knob-at-a-time ablation suggested a ``bandwidth-gated advantage'', but a
 subsequent \emph{adversarial self-audit} found those runs were undertrained
 (L-BFGS disabled; every Burgers model stuck at rel-$L_2\approx0.47$, the shock
 unresolved by any model), making the comparisons differences between failing
-models. We therefore re-ran a converged core (L-BFGS on, three seeds each). The
-converged results overturn the optimistic reading and yield two firm findings.
-\textbf{(1) No quantum advantage:} at matched parameters the classical PINN
-(rel-$L_2$ $0.248\!\pm\!0.031$) beats \emph{every} QAPINN variant; the best QAPINN
-(depth-5, $0.314$) only reaches the level of a structurally-identical classical
-front-end control ($0.315$). \textbf{(2) Entanglement significantly \emph{hurts}
-at convergence:} removing entanglement improves the depth-3 QAPINN from
-$0.424\!\pm\!0.005$ to $0.369\!\pm\!0.022$ ($t\!\approx\!4$, $p\!\approx\!0.01$,
-$n=3$), inverting the field's ``entanglement-driven expressibility'' narrative for
-this task. We also correct a framing error the audit exposed: the verified
-``band $=$ depth'' fact governs the \emph{VQC features}, not the full model --- the
-tanh post-net synthesises harmonics beyond the band, so a depth-3 model reaches
-$k\!=\!22$ once trained. The pipeline is independently verified (8/8 checks) and
-every reported number matches its raw log; the contribution is an honest,
-controlled negative plus one counter-intuitive, seed-backed positive finding,
-delivered with the matched controls, fair structural control, and multi-seed
-statistics the QAPINN literature generally lacks.
+models. We therefore re-ran converged cores (L-BFGS on) at two model scales, with
+multi-seed statistics and fair controls. The result is a consistent, honest
+negative. \textbf{(1) At small (121-param) scale}, the classical PINN
+(rel-$L_2$ $0.248\!\pm\!0.031$) beats every QAPINN. \textbf{(2) At resolved
+(1273-param) scale}, the QAPINN appears to win --- but only against a \emph{shallow}
+classical net: QAPINN-none reaches $0.094\!\pm\!0.075$ vs a shallow classical's
+$0.24$ ($p\!=\!0.003$), yet a \emph{depth-matched} classical net ties it
+($0.133\!\pm\!0.047$, $p\!=\!0.35$), showing the gain is architectural (depth,
+post-net width) and classically reproducible, \emph{not} quantum-specific.
+\textbf{(3) No robust entanglement effect:} an $n\!=\!3$ ``entanglement hurts''
+signal ($p\!\approx\!0.02$) \emph{vanished} at $n\!=\!6$ ($p\!=\!0.41$) --- a lucky
+draw we retract; at the larger scale the entanglement gap is likewise
+non-significant ($p\!=\!0.44$). We also correct a framing error: the verified
+``band $=$ depth'' fact governs the \emph{VQC features}, not the full model (the
+tanh post-net reaches $k\!=\!22$ once trained). The pipeline is independently
+verified (8/8) and every number matches its log. The contribution is a rigorous
+negative result and the controlled methodology --- matched, structural, and
+depth-matched controls, multi-seed statistics, and an adversarial audit --- that
+repeatedly exposed over-claims the QAPINN literature usually leaves standing.
 \end{abstract}
 
 \tableofcontents
@@ -489,15 +491,34 @@ best QAPINN (depth-5, $0.314$) merely reaches the classical-front-end control
 ($0.315$) and still loses to the classical MLP. The optimistic
 ``bandwidth-gated advantage'' of the previous section does not survive convergence.
 
-\paragraph{Finding 2 --- entanglement hurts at convergence.} Removing entanglement
-improves the depth-3 QAPINN from $0.424\pm0.005$ to $0.369\pm0.022$ (gap $0.056$,
-$t\approx4.3$, $p\approx0.01$ at $n=3$; the seed ranges do not overlap). This is the
-opposite sign to the field's ``entanglement-driven expressibility'' expectation, and
-opposite to what the \emph{undertrained} entanglement sweep reported (``within
-noise''): convergence flips it. A plausible mechanism (to be confirmed) is that
-entanglement correlates the per-qubit Fourier features feeding the post-net and
-constrains the realisable coefficients (cf.\ Mhiri et al.), giving the classical
-readout a poorer basis --- while adding a trainability cost.
+\paragraph{Finding 2 --- the larger-model regime, and the fair-control test.} The
+small-model comparison is between models that only partly resolve the shock
+(rel-$L_2$ $0.25$--$0.42$). We therefore repeated the core at a resolved scale
+($\sim$1273 params: post-net $[32,32]$, 6000 collocation points), with $n=6$ seeds,
+against \emph{two} fair controls --- a structural control (CFE: identical post-net,
+classical front end) and a \emph{depth-matched} classical net ($[2,22,22,22,1]$).
+\begin{center}\small\begin{tabular}{lcc}\toprule
+model ($\sim$1273p, $n{=}6$) & rel-$L_2$ & vs QAPINN-none \\ \midrule
+QAPINN depth-3, no entanglement & $\mathbf{0.094 \pm 0.075}$ & --- \\
+QAPINN depth-3, linear          & $0.128 \pm 0.056$ & $p=0.44$ \\
+classical, depth-matched $[2,22,22,22,1]$ & $0.133 \pm 0.047$ & $p=0.35$ (n.s.) \\
+CFE structural control          & $0.173 \pm 0.048$ & $p=0.076$ \\
+classical, shallow              & $0.241 \pm 0.037$ & $p=0.003$ \\
+\bottomrule\end{tabular}\end{center}
+The QAPINN beats a \emph{shallow} classical net decisively ($p=0.003$), which in
+isolation looks like a resolved-scale quantum advantage. But a \emph{depth-matched}
+classical net closes the gap ($0.133$ vs $0.094$, $p=0.35$, not significant): the
+improvement is \textbf{architectural} (depth and post-net width) and reproducible
+classically, \emph{not} quantum-specific. Against the fair controls there is no
+statistically significant quantum advantage at either scale.
+
+\paragraph{Finding 3 --- no robust entanglement effect (a retraction).} An earlier
+$n=3$ result --- entanglement-none beating linear at convergence, $0.369$ vs $0.424$,
+$p\approx0.02$ --- did \emph{not} survive seed expansion: at $n=6$ the gap collapses
+($0.379$ vs $0.402$, $p=0.41$), and one new linear seed ($0.292$) is the best of all.
+It was a lucky three-seed draw, and we retract it. At the larger scale the
+entanglement gap is likewise non-significant ($p=0.44$). This is the audit discipline
+working: an under-powered $n=3$ effect that would have been a false headline.
 
 \paragraph{A framing correction.} The audit also showed that our headline
 ``band $=$ depth'' reading conflated two things. The identity ``re-upload depth $L$
@@ -512,16 +533,21 @@ trend is non-monotone across qubit count.
 
 % ===========================================================================
 \section{Discussion}
-With the converged core in hand, the honest reading is simple and one-directional:
-for this small-model Burgers task, \emph{the quantum layer does not help}, and its
-one clearly quantum-specific effect --- entanglement --- \emph{hurts} at convergence.
-The earlier ``bandwidth'' story survives only in weakened, prior-theory form: more
-re-upload depth gives richer, easier-to-optimise features (depth-5 beats depth-3),
-but this is not a hard bandwidth limit on the model and does not buy an advantage
-over a matched classical net. The value of the study is methodological and
-negative-with-attribution: a verified pipeline, matched and \emph{structurally}
-matched (CFE) controls, multi-seed statistics, and an adversarial audit that caught
-our own over-claims --- exactly the discipline the QAPINN literature usually omits.
+Across two model scales, three control types, and multi-seed statistics, the honest
+reading is one-directional: \emph{we find no statistically significant quantum-specific
+advantage for the QAPINN on 1-D Burgers.} At small scale the classical PINN simply
+wins; at resolved scale the QAPINN beats a shallow classical net but ties a
+depth-matched one, so the gain is architectural and classically reproducible.
+Entanglement shows no robust effect at either scale. The recurring pattern is the
+real lesson: \emph{every apparent quantum advantage in this project dissolved under a
+fair control} --- the ``quantum diversifies the classical neurons'' effect died under
+the CFE control; the ``entanglement hurts'' effect died under seed expansion; the
+``resolved-scale advantage'' died under a depth-matched classical baseline. The value
+of the study is therefore methodological: a verified pipeline, matched, structural,
+and depth-matched controls, multi-seed statistics, and an adversarial self-audit that
+repeatedly caught our own over-claims --- precisely the discipline the QAPINN
+literature usually omits, and without which each of those three over-claims would
+have been reported as a positive result.
 
 % ===========================================================================
 \section{Limitations}
@@ -532,29 +558,34 @@ five or more would firm it up. (2) \textbf{Small-model regime:} at 121 parameter
 even the converged models sit at rel-$L_2$ $0.25$--$0.42$; the Burgers shock is
 better resolved than before but not fully resolved, and the orderings could shift
 with larger networks. (3) \textbf{Mechanism not yet isolated:} we have the number
-for ``entanglement hurts'' but not a verified account of \emph{why} (the
-feature-correlation/coefficient-constraint hypothesis is untested). (4)
-\textbf{Pre-convergence ablations superseded:} the single-seed Tier-1/Tier-3
+for a hypothetical entanglement effect that ultimately did not survive (§Finding 3).
+(4) \textbf{Pre-convergence ablations superseded:} the single-seed Tier-1/Tier-3
 sections are undertrained and are retained only for transparency; their optimistic
 readings (bandwidth-gated advantage, barren-plateau signature) did not survive the
 audit. (5) \textbf{Simulation only} (\texttt{default.qubit}, statevector, no shot
-noise); parameter reduction is not resource reduction. The pipeline is verified
+noise); parameter reduction is not resource reduction. A genuine quantum advantage
+at still-larger scale, more seeds, or on other PDEs is not excluded --- only that we
+find none here under fair controls. The pipeline is verified
 (Table~\ref{tab:verify}) and every number matches its raw log.
 
 % ===========================================================================
 \section{Conclusion}
 Using a verified, parameter-matched bench, a five-dimension XAI suite, and an
-adversarial self-audit that corrected our own initial over-claims, we reach a clear
-and honest result on this small-model Burgers task. At convergence and matched
-parameters, \textbf{the QAPINN offers no accuracy advantage} over a classical PINN;
-and its one clearly quantum-specific knob, \textbf{entanglement, significantly hurts}
-($0.369$ vs $0.424$ without vs with entanglement, $p\approx0.01$), inverting the
-field's default expectation. The often-cited ``VQC $=$ Fourier band $=$ depth'' fact
-is verified but describes the quantum \emph{features}, not the full model, whose
-classical readout escapes the band. The remaining work is to isolate the mechanism
-of the entanglement effect, extend to a resolved (larger-model) regime and more
-seeds, and test whether the ``entanglement hurts'' sign holds across PDEs --- the
-programme detailed in the companion (extended) report.
+adversarial self-audit that repeatedly corrected our own over-claims, we reach a
+clear and honest result. Across two model scales, three control types (matched,
+structural, and depth-matched), and multi-seed statistics, \textbf{we find no
+statistically significant quantum-specific advantage} for the QAPINN on 1-D Burgers:
+at small scale the classical PINN wins; at resolved scale the QAPINN beats a shallow
+classical net but ties a depth-matched one, so the gain is architectural and
+classically reproducible; and \textbf{no robust entanglement effect} appears at
+either scale (an $n=3$ ``entanglement hurts'' signal deflated at $n=6$). The
+often-cited ``VQC $=$ Fourier band $=$ depth'' fact is verified but describes the
+quantum \emph{features}, not the full model. The enduring contribution is the
+controlled methodology itself: three separate apparent advantages each dissolved
+under the appropriate fair control, and each would have been a false positive without
+it --- which is precisely the discipline the QAPINN literature most needs. Whether a
+genuine advantage emerges at still-larger scale or on other PDEs is left open by, not
+contradicted by, this work.
 
 % ===========================================================================
 \begin{thebibliography}{9}
