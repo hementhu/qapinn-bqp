@@ -370,16 +370,17 @@ own over-claims.
 
 % ===========================================================================
 \section{Current Limitations}
-The converged findings (Section~\ref{sec:converged}) are firm in direction but
-bounded: (1) \textbf{modest $n$} --- three seeds (enough for entanglement at
-$p\approx0.01$; five would firm it up); (2) \textbf{small-model regime} --- at 121
-params even converged models sit at rel-$L_2$ $0.25$--$0.42$, the shock better but
-not fully resolved, so orderings could shift with larger nets; (3) \textbf{mechanism
-not isolated} --- we have the ``entanglement hurts'' number but not a verified
-\emph{why}; (4) \textbf{one PDE, simulation only} (no shot noise / hardware);
-parameter reduction is not resource reduction. The pre-convergence single-seed
-ablations are retained for transparency but are superseded. Pipeline verified; every
-number matches its log.
+The findings are firm in direction but bounded: (1) \textbf{modest $n$, underpowered
+nulls} --- the decisive comparisons are \emph{failures to reject} (e.g.\ QAPINN-none
+vs.\ depth-matched classical, $p=0.35$) under high seed variance; we caught one $n=3$
+effect that reversed at $n=6$ (and which Welch's test never called significant even at
+$n=3$, $p=0.06$), so all single-scale nulls are provisional; (2) \textbf{small-model
+regime} --- at 121 params converged models sit at rel-$L_2$ $0.25$--$0.42$, so
+orderings could shift with larger nets (we test one larger scale, not a full curve);
+(3) \textbf{one PDE family, simulation only} (no shot noise / hardware); parameter
+reduction is not resource reduction. The pre-convergence single-seed ablations are
+retained for transparency but are superseded. Pipeline verified; every number matches
+its log.
 
 % ===========================================================================
 \section{Future Work and Experimental Roadmap}
