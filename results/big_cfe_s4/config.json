@@ -1,0 +1,32 @@
+{
+  "name": "big_cfe_s4",
+  "num_params": 1261,
+  "architecture": {
+    "type": "cfe",
+    "width": 4,
+    "post": [
+      4,
+      32,
+      32,
+      1
+    ],
+    "num_params": 1261
+  },
+  "raw": {
+    "name": "big_cfe_s4",
+    "model": "cfe",
+    "width": 4,
+    "post_hidden": [
+      32,
+      32
+    ],
+    "pde": "burgers",
+    "seed": 4,
+    "log_every": 200,
+    "probe_every": 0,
+    "n_interior": 6000,
+    "adam_iters": 3000,
+    "lbfgs_iters": 600,
+    "checkpoint_every": 0
+  }
+}
