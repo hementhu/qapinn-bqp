@@ -555,6 +555,70 @@ quantity was the post-net gradient, not the variational-parameter gradient, and 
 trend is non-monotone across qubit count.
 
 % ===========================================================================
+\section{Mechanistic Interpretation: \emph{Why}}\label{sec:why}
+The sections above establish \emph{what} happens; here we assemble \emph{why},
+tagging each explanation \textbf{[measured]} (directly verified) or \textbf{[reasoned]}
+(grounded in theory and our controls, but not independently measured).
+
+\paragraph{Why there is no quantum-specific advantage. [reasoned]} The VQC acts as a
+\emph{fixed Fourier feature map}: it supplies the classical post-net with
+trigonometric features of $(x,t)$, and the post-net --- itself a universal
+approximator --- builds the solution. The expressivity bottleneck is therefore the
+\emph{post-net}, not the front end. Any front end spanning a comparable function space
+lets the post-net reach the same solution, which is precisely why the
+structurally-matched CFE (classical $\mathrm{Linear}+\tanh$ front end) \emph{and} a
+depth-matched classical net both tie the QAPINN (Section~\ref{sec:converged}). The
+quantum Fourier features are not a \emph{better} basis for Burgers than classical
+features: away from the shock the solution is low-frequency and every basis represents
+it; at the shock it demands high harmonics that no basis supplies at depth 3. With no
+regime in which the Fourier/entangled basis is more efficient, there is no advantage to
+be had --- which our fair controls confirm.
+
+\paragraph{Why entanglement is neutral. [reasoned]} At fixed depth the accessible band
+is fixed ($\{-L,\dots,L\}$); entanglement only changes \emph{which coefficients within
+that band} are reachable (the Mhiri constraint). But the post-net recombines the
+\emph{unentangled} per-qubit Fourier features into the same target function, so that
+redistribution is largely redundant for this task. We tried to measure this
+(per-qubit feature correlation and effective rank, none vs.\ linear); the metrics
+conflicted (correlation rose with entanglement, but so did feature rank), so we report
+it as a theory-grounded interpretation consistent with the observed null, not a
+measured mechanism.
+
+\paragraph{Why the encoding scale collapses the model at $2\pi$. [measured]} Scaling
+the encoding to $x\!\mapsto\!2\pi x$ wraps a full period over the domain, so
+neighbouring collocation points map to widely separated circuit states (the realised
+spectrum aliases to the Nyquist frequency, verified). The loss surface around the true
+solution flattens and the optimiser descends into the trivial ($u\!\equiv\!0$) basin
+that satisfies only the homogeneous BCs --- the ``black-hole'' collapse, produced
+deterministically by an encoding choice.
+
+\paragraph{Why ``band $=$ depth'' holds for the features but not the model. [measured]}
+The identity (max harmonic $=$ re-upload depth) is a property of the VQC output,
+verified for $L=1\text{--}6$. The post-net then applies $\tanh$ to combinations of
+these features; the Taylor expansion of $\tanh$ contains \emph{products} of inputs,
+generating sum/difference frequencies far above the band. A converged depth-3 QAPINN
+thus realises harmonics to $k\!\approx\!22$ (verified by FFT of the trained model),
+while an under-trained one stalls near $k\!\approx\!3$. The band bounds the
+\emph{features}; the nonlinear readout is unbounded.
+
+\paragraph{Why the shock defeats every model. [measured]} The Burgers shock is a
+near-discontinuity whose Fourier content decays only as $\sim 1/k$. By the F-principle
+(verified: low harmonics' error halves first) a gradient-trained network fits low
+frequencies early and the high-frequency shock content last --- or not at all within
+budget. This is a \emph{classical} PINN pathology; the quantum layer neither causes nor
+cures it, which is itself a mechanistic reason the quantum layer changes nothing where
+accuracy is decided.
+
+\paragraph{Synthesis.} The quantum component sits \emph{upstream} of the part of the
+network that does the representational work. It contributes a fixed Fourier feature map
+whose useful content (a low-frequency band) is equally available to a classical front
+end, and whose extra structure (entanglement, correlator choice) is redundant once a
+flexible post-net follows. The quantum layer's only decisive effects we observe are
+\emph{negative} (the aliasing collapse) or \emph{shared with the classical model}
+(spectral bias at the shock). Hence no quantum-specific advantage --- for a reason, not
+merely as a measured null.
+
+% ===========================================================================
 \section{Discussion}
 Across two model scales, three control types, and multi-seed statistics, the honest
 reading is one-directional: \emph{we find no statistically significant quantum-specific

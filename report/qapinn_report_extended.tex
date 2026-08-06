@@ -362,6 +362,37 @@ $k{=}22$ once trained), so the earlier ``$k\approx3$ band edge'' was an undertra
 artifact; the ``barren-plateau in qubit count'' is withdrawn (wrong gradient
 measured, non-monotone trend).
 
+\subsection{Mechanistic interpretation: \emph{why} (not just \emph{whether})}
+\label{sec:why}
+Each explanation is tagged \textbf{[measured]} or \textbf{[reasoned]}.
+\begin{itemize}[nosep]
+  \item \textbf{No quantum advantage [reasoned].} The VQC is a \emph{fixed Fourier
+  feature map}; the classical post-net (a universal approximator) does the
+  representational work, so it is the bottleneck --- not the front end. Any front end
+  spanning a comparable space suffices, which is why the CFE and a depth-matched
+  classical net both tie the QAPINN. The quantum features are not a \emph{better} basis
+  for Burgers: low-frequency away from the shock (any basis suffices), high-frequency at
+  the shock (no basis supplies it at depth 3). No regime favours the quantum basis.
+  \item \textbf{Entanglement neutral [reasoned].} At fixed band, entanglement only
+  redistributes \emph{which} in-band coefficients are reachable (Mhiri); the post-net
+  recombines the unentangled per-qubit features into the same function, making the
+  redistribution redundant. Our direct probe (feature correlation/rank) was
+  inconclusive, so this is theory-grounded, not measured.
+  \item \textbf{$2\pi$ collapse [measured].} The encoding aliases to Nyquist; the loss
+  landscape flattens and the optimiser falls into the trivial-solution basin.
+  \item \textbf{Band $=$ depth for features, not model [measured].} $\tanh$ in the
+  post-net produces products of the $\le\!k3$ features $\Rightarrow$ harmonics to
+  $k\!\approx\!22$ in a converged model. The band bounds features, not the readout.
+  \item \textbf{Shock defeats all [measured].} $1/k$ spectral tail $+$ the F-principle
+  $\Rightarrow$ high-frequency shock content converges last/never --- a classical PINN
+  pathology the quantum layer neither causes nor cures.
+\end{itemize}
+\emph{Synthesis:} the quantum layer sits upstream of the representational bottleneck,
+contributes a Fourier band a classical front end also provides, and adds structure
+(entanglement) the post-net makes redundant --- so there is no quantum-specific
+advantage \emph{for a reason}, and its only decisive effects are negative (aliasing) or
+shared (spectral bias).
+
 \subsection{Discussion}
 With the converged core in hand the reading is one-directional: for this small-model
 Burgers task the quantum layer offers \emph{no} accuracy advantage, and its one
