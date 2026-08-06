@@ -1,0 +1,33 @@
+{
+  "name": "big_cls_deep_s5",
+  "num_params": 1101,
+  "architecture": {
+    "type": "classical",
+    "layers": [
+      2,
+      22,
+      22,
+      22,
+      1
+    ]
+  },
+  "raw": {
+    "name": "big_cls_deep_s5",
+    "model": "classical",
+    "layers": [
+      2,
+      22,
+      22,
+      22,
+      1
+    ],
+    "pde": "burgers",
+    "seed": 5,
+    "log_every": 200,
+    "probe_every": 0,
+    "n_interior": 6000,
+    "adam_iters": 3000,
+    "lbfgs_iters": 600,
+    "checkpoint_every": 0
+  }
+}

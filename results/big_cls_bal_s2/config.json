@@ -1,0 +1,31 @@
+{
+  "name": "big_cls_bal_s2",
+  "num_params": 1185,
+  "architecture": {
+    "type": "classical",
+    "layers": [
+      2,
+      32,
+      32,
+      1
+    ]
+  },
+  "raw": {
+    "name": "big_cls_bal_s2",
+    "model": "classical",
+    "layers": [
+      2,
+      32,
+      32,
+      1
+    ],
+    "pde": "burgers",
+    "seed": 2,
+    "log_every": 200,
+    "probe_every": 0,
+    "n_interior": 6000,
+    "adam_iters": 3000,
+    "lbfgs_iters": 600,
+    "checkpoint_every": 0
+  }
+}
