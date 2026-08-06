@@ -124,7 +124,7 @@ section("2. Tier-1: re-upload depth (undertrained, single seed)",
 
 section("3. Tier-1: entanglement (band fixed, undertrained, single seed)",
     "At A2000 accuracy barely moves while entropy swings — LOOKED like a null; convergence later "
-    "showed entanglement HURTS (see §0).",
+    "at n=3 looked like entanglement hurts, but this DEFLATED at n=6 (p=0.41) -- retracted; see §0/§0b).",
     [row("abl_ent_none","entropy ~0 (validates sanity check)"),
      row("abl_baseline","linear (reference)"),
      row("abl_ent_ring","higher entropy, ~same accuracy"),
@@ -169,7 +169,7 @@ section("9. CFE fair controls (undertrained, single seed)",
      row("cfe_q3"), row("cfe_q5"), row("cfe_q6")])
 
 section("10. Convergence probes (8000 iter, single seed)",
-    "First hint that entanglement hurts at convergence (later confirmed with seeds in §0).",
+    "An n=3 signal suggested entanglement hurts here; it did NOT survive seed expansion (n=6, p=0.41) -- retracted.",
     [row("conv_cls_121","classical, long train"),
      row("conv_qapinn_base","entangled — stays band-limited"),
      row("conv_qapinn_entnone","no-ent — crisp shock, matches k1..20")])
@@ -214,7 +214,7 @@ out += ["## Status ledger — what survived the audit",
         "| Depth 'monotonically' helps | overstated | single-seed; some steps within noise |",
         "| Barren-plateau in qubit count | **refuted** | non-monotone + measured wrong gradient |",
         "| Quantum diversifies classical neurons | refuted | died under CFE control (§9) |",
-        "| Entanglement 'not significant' | superseded | true at A2000, but HURTS at convergence |",
+        "| Entanglement 'not significant' | **confirmed** | n.s. at A2000 AND at convergence n=6 (p=0.41) |",
         ""]
 
 Path("report/master_results.md").write_text("\n".join(out), encoding="utf-8")

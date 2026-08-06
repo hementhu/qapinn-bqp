@@ -441,11 +441,14 @@ where the QAPINN's gradient variance instead \emph{shrinks with qubit count} ---
 barren-plateau signature (Fig.~\ref{fig:classical}).
 
 The honest conclusion: under a fair, structurally-matched control the classical-side
-``mechanism'' does \emph{not} yield a clean robust effect. What survives is
-(i) a \emph{bandwidth-gated} accuracy advantage (the fair control ties the QAPINN
-at low bandwidth, and the plain-PINN comparison overstated the gap), and (ii) a
-\emph{barren-plateau signature} --- the QAPINN's post-net gradient variance
-decreases with qubit count.
+``mechanism'' does \emph{not} yield a clean robust effect --- the diversity effect is
+inconsistent across knobs, and the gradient-amplification effect reverses at higher
+qubit count. \emph{Both readings above are single-seed and are superseded by the
+converged, multi-seed analysis (Section~\ref{sec:converged}):} the earlier
+``bandwidth-gated advantage'' does not survive convergence, and the
+``barren-plateau signature'' is withdrawn (it measured the post-net gradient, not the
+variational-parameter gradient, and the trend is non-monotone). We retain this
+section only to document how the plain-PINN comparison overstated the gap.
 
 \begin{figure}[t]
   \centering
@@ -549,13 +552,29 @@ repeatedly caught our own over-claims --- precisely the discipline the QAPINN
 literature usually omits, and without which each of those three over-claims would
 have been reported as a positive result.
 
+\paragraph{The deliverable --- a falsification protocol (our answer to Task~4).} The
+challenge asks for a circuit-design methodology; our data do not warrant one (no
+robust advantage to design toward). What transfers instead is the four-gate protocol
+that killed our own over-claims: \textbf{(1)} train to convergence (L-BFGS), not
+Adam-only --- most apparent gains were undertraining; \textbf{(2)} compare against a
+param-matched \emph{and} structurally-matched \emph{and} depth-matched classical
+control, not an arbitrary MLP; \textbf{(3)} require multi-seed significance
+($n\!\ge\!6$) --- an $n\!=\!3$, $p\!=\!0.02$ effect here reversed at $n\!=\!6$;
+\textbf{(4)} test Fourier-band claims on the VQC output, not the post-net-filtered
+model. An advantage that survives all four gates would justify a design methodology;
+ours survives none.
+
 % ===========================================================================
 \section{Limitations}
 The two converged findings (Section~\ref{sec:converged}) are firm in direction but
-bounded in scope. (1) \textbf{Modest $n$:} the converged core is three seeds per
-configuration --- enough for the entanglement effect to clear $p\approx0.01$, but
-five or more would firm it up. (2) \textbf{Small-model regime:} at 121 parameters
-even the converged models sit at rel-$L_2$ $0.25$--$0.42$; the Burgers shock is
+bounded in scope. (1) \textbf{Modest $n$ and an underpowered null:} the converged
+cores use three-to-six seeds, and the decisive comparisons are \emph{failures to
+reject} a difference (e.g.\ QAPINN-none vs.\ depth-matched classical, $p=0.35$),
+under high seed variance (the $0.094\pm0.075$ QAPINN-none is $\sim$80\% relative
+spread). More seeds would tighten these; we caught one $n=3$ effect that reversed at
+$n=6$, so we treat all single-scale nulls as provisional. (2) \textbf{Small-model
+regime:} at 121 parameters even the converged models sit at rel-$L_2$ $0.25$--$0.42$;
+the Burgers shock is
 better resolved than before but not fully resolved, and the orderings could shift
 with larger networks. (3) \textbf{Mechanism not yet isolated:} we have the number
 for a hypothetical entanglement effect that ultimately did not survive (§Finding 3).

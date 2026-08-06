@@ -286,8 +286,12 @@ bandwidth-gated (QAPINN ties at low depth/qubits, wins at depth 5 / 6 qubits /
 heat); neuron diversity is inconsistent (classical front-end more diverse on the
 depth axis, quantum more on qubits); and gradient amplification reverses at 5--6
 qubits, where the QAPINN gradient variance shrinks with qubit count (a
-barren-plateau signature). What survives: a bandwidth-gated advantage and a
-barren-plateau signature --- the classical-side ``mechanism'' is not a clean effect.
+barren-plateau signature). \emph{These single-seed readings are superseded by the
+converged, multi-seed analysis (§\ref{sec:converged}):} the ``bandwidth-gated
+advantage'' does not survive convergence and the ``barren-plateau signature'' is
+withdrawn (wrong gradient measured, non-monotone trend). Nothing here survives as a
+robust quantum-specific effect; the section documents only how the plain-PINN
+comparison overstated the gap.
 
 \begin{table}[t]
   \centering \small
@@ -386,17 +390,18 @@ We record them as completed, then give the genuinely open roadmap.
 
 \subsection{Tier 2a --- Convergence analysis \textnormal{(\textbf{done})}}
 Long-training the headline configs to $\sim$8000 iters, then the full converged core
-(L-BFGS on, 3 seeds), \emph{answered} the central worry: the undertrained orderings
-were transients. Convergence roughly halved every error and \emph{flipped} the
-entanglement result from ``within noise'' to ``significantly harmful'', while the
-QAPINN's accuracy advantage over a matched classical net \emph{disappeared}. This is
-the single most important result in the report.
+(L-BFGS on), \emph{answered} the central worry: the undertrained orderings were
+transients. Convergence roughly halved every error, and the QAPINN's apparent
+accuracy advantage over a matched classical net \emph{disappeared}. A tentative
+``entanglement harmful'' signal appeared here at $n=3$ but was later retracted (2b).
 
 \subsection{Tier 2b --- Multi-seed robustness \textnormal{(\textbf{done})}}
-The entanglement effect now carries error bars: none $0.369\pm0.022$ vs linear
-$0.424\pm0.005$ over three seeds ($p\approx0.01$), and the seven-seed \emph{undertrained}
-sweep confirmed the earlier ``within noise'' reading was a budget artifact. Five-plus
-seeds on the converged core remains a cheap firming-up step.
+Seeds proved decisive --- and cautionary. An $n=3$ ``entanglement hurts'' result
+(none $0.369\pm0.022$ vs linear $0.424\pm0.005$, $p\approx0.02$) looked clean, but
+expanding to $n=6$ \emph{collapsed} it ($0.379$ vs $0.402$, $p=0.41$); it was a lucky
+three-seed draw and is retracted. This is the report's clearest lesson in
+under-powered nulls, and it is why every single-scale comparison here is treated as
+provisional pending more seeds.
 
 \subsection{Tier 2c --- The classical-front-end control \textnormal{(\textbf{done})}}
 The CFE (identical post-net, classical $2\!\to\!4$ front end) was built and run both
@@ -456,12 +461,28 @@ $=2\pi$ collapses (aliasing). These now need converged, multi-seed repeats to be
   ``black-hole'' collapse.
 \end{itemize}
 
-\subsection{The deliverable --- design methodology}
-The end goal (challenge Task 4) is a validated chain: \emph{cheap proxy}
-(Reynolds/$\nu$, or a coarse classical/FEA solve) $\to$ estimated solution
-bandwidth $\to$ prescribed circuit (qubits, depth, encoding). Validation uses exact
-solutions; deployment uses the proxy, resolving the circularity of ``needing the
-solution to size the circuit.''
+\subsection{The deliverable --- from ``design methodology'' to a falsification protocol}
+The challenge asks (Task~4) for a problem-specific circuit-design methodology. Our
+data do not support one: with no robust quantum-specific advantage, a
+proxy$\to$bandwidth$\to$circuit prescription would be premature. What our study
+\emph{does} yield --- and what we offer as the transferable deliverable --- is a
+\textbf{falsification protocol for claimed QAPINN advantages}, distilled from the
+three over-claims it killed:
+\begin{enumerate}[nosep]
+  \item \textbf{Train to convergence first} (L-BFGS, not Adam-only): most apparent
+  advantages here were undertraining artifacts.
+  \item \textbf{Compare against the right control:} a param-matched \emph{and}
+  structurally-matched (same post-net) \emph{and} depth-matched classical net --- not
+  an arbitrary MLP. Each stricter control killed a different apparent effect.
+  \item \textbf{Require multi-seed significance} ($n\!\ge\!6$): an $n\!=\!3$ effect at
+  $p\!=\!0.02$ here reversed at $n\!=\!6$.
+  \item \textbf{Separate features from model:} verify claims about the VQC's Fourier
+  band on the VQC output, not the post-net-filtered model output.
+\end{enumerate}
+Applied to our own results, this protocol converts three would-be positives into an
+honest null --- which is precisely its value. A genuine design methodology becomes
+warranted only once an advantage survives all four gates on some problem; the future
+tiers below are how one would look for that.
 
 \begin{table}[t]
   \centering \small
@@ -484,27 +505,26 @@ solution to size the circuit.''
 % ===========================================================================
 \section{What Is Currently Left Out (Scope Boundaries)}
 \label{sec:leftout}
-For transparency, the present study explicitly does \emph{not} yet include:
+For transparency, the present study explicitly does \emph{not} include (note: the
+statistics/convergence/knob items of the earlier draft are now \emph{done} --- see the
+converged and larger-model sections --- and are removed from this list):
 \begin{itemize}[nosep]
-  \item \textbf{Statistics:} no repeated seeds, no error bars, no significance
-  tests --- every result is a single point estimate.
-  \item \textbf{Convergence:} nothing trained to convergence; all Burgers results
-  are Adam-only and undertrained.
-  \item \textbf{Breadth of PDEs:} only Burgers and heat; no real CFD (cavity),
-  no $\nu$-continuum.
-  \item \textbf{Full VQC knob set:} qubits, measurement (incl.\ probability
-  vector), input\_scale, encoding scheme, and loss weighting are not yet ablated;
-  Tier 1 covered only depth, entanglement, and post-net width.
+  \item \textbf{Breadth of PDEs:} only Burgers and heat; no real CFD (lid-driven
+  cavity, though \texttt{cavity.py} is built), and the $\nu$-continuum is single-seed.
+  \item \textbf{Larger scales / more seeds:} the decisive comparisons are $n\!\le\!6$
+  with high seed variance; still-larger models and $5$--$8$ seeds would firm the nulls.
+  \item \textbf{Probability-vector readout:} the $\langle Z\rangle$/$\langle ZZ\rangle$
+  measurements are ablated, but the probability-vector observable the challenge lists
+  is not implemented (it breaks the higher-order autograd needed for $u_{xx}$).
   \item \textbf{Coefficient-level Fourier analysis:} we measure realised frequency
-  \emph{support}, not the realised \emph{coefficients} vs their reachable set
-  (Mhiri).
-  \item \textbf{Trainability theory:} the black-hole collapse and barren plateaus
-  are discussed but not systematically measured on QAPINNs.
+  \emph{support}, not the realised \emph{coefficients} vs their reachable set (Mhiri).
   \item \textbf{Hardware / noise:} statevector simulation only; no shot noise, no
   device runs; ``parameter reduction'' is not ``resource reduction''
   ($\sim$85$\times$ slower in simulation).
-  \item \textbf{Design methodology:} the proxy$\to$bandwidth$\to$circuit rule is
-  designed but not yet validated end-to-end.
+  \item \textbf{Validated design methodology:} because we find no robust
+  quantum-specific advantage, a proxy$\to$bandwidth$\to$circuit prescription is not
+  warranted by our data; what we offer instead (below) is a \emph{falsification
+  protocol} for claimed advantages.
 \end{itemize}
 
 % ===========================================================================

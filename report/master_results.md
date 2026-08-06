@@ -51,7 +51,7 @@ Authoritative `rel_l2` / `num_params` from each run's `summary.json`. `train` = 
 | abl_depth_5 | qapinn | 137 | L5,4q,linear | A2000 | **0.424** | best of sweep; error band narrower |
 
 ## 3. Tier-1: entanglement (band fixed, undertrained, single seed)
-*At A2000 accuracy barely moves while entropy swings — LOOKED like a null; convergence later showed entanglement HURTS (see §0).*
+*At A2000 accuracy barely moves while entropy swings — LOOKED like a null; convergence later at n=3 looked like entanglement hurts, but this DEFLATED at n=6 (p=0.41) -- retracted; see §0/§0b).*
 
 | run | model | params | config | train | rel-L2 | note |
 |---|---|---|---|---|---|---|
@@ -128,7 +128,7 @@ Authoritative `rel_l2` / `num_params` from each run's `summary.json`. `train` = 
 | cfe_q6 | cfe | 147 | — | A2000 | **0.467** |  |
 
 ## 10. Convergence probes (8000 iter, single seed)
-*First hint that entanglement hurts at convergence (later confirmed with seeds in §0).*
+*An n=3 signal suggested entanglement hurts here; it did NOT survive seed expansion (n=6, p=0.41) -- retracted.*
 
 | run | model | params | config | train | rel-L2 | note |
 |---|---|---|---|---|---|---|
@@ -176,4 +176,4 @@ Authoritative `rel_l2` / `num_params` from each run's `summary.json`. `train` = 
 | Depth 'monotonically' helps | overstated | single-seed; some steps within noise |
 | Barren-plateau in qubit count | **refuted** | non-monotone + measured wrong gradient |
 | Quantum diversifies classical neurons | refuted | died under CFE control (§9) |
-| Entanglement 'not significant' | superseded | true at A2000, but HURTS at convergence |
+| Entanglement 'not significant' | **confirmed** | n.s. at A2000 AND at convergence n=6 (p=0.41) |
