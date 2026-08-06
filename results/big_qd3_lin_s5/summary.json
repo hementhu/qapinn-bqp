@@ -1,0 +1,54 @@
+{
+  "rel_l2": 0.10728161989031106,
+  "final_total": 0.006370986811816692,
+  "final_pde": 0.0030542274471372366,
+  "final_constraints": 0.0033167593646794558,
+  "train_time_s": 11894.630634400062,
+  "num_params": 1273,
+  "config": {
+    "pde": "burgers",
+    "pde_params": {},
+    "n_interior": 6000,
+    "n_constraint": 150,
+    "adam_iters": 3000,
+    "adam_lr": 0.01,
+    "lbfgs_iters": 600,
+    "w_pde": 1.0,
+    "w_constraints": 1.0,
+    "seed": 5,
+    "log_every": 100,
+    "eval_nx": 256,
+    "eval_nt": 100,
+    "probe_every": 25,
+    "checkpoint_every": 0
+  },
+  "architecture": {
+    "type": "qapinn",
+    "vqc": {
+      "n_qubits": 4,
+      "n_layers": 3,
+      "reupload": true,
+      "entanglement": "linear",
+      "measurement": "multi",
+      "input_scale": 1.0
+    },
+    "coord_map": [
+      0,
+      1,
+      0,
+      1
+    ],
+    "vqc_out_dim": 4,
+    "post": [
+      4,
+      32,
+      32,
+      1
+    ],
+    "param_breakdown": {
+      "vqc": 24,
+      "post": 1249,
+      "total": 1273
+    }
+  }
+}

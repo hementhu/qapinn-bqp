@@ -1,0 +1,59 @@
+{
+  "name": "big_qd3_lin_s3",
+  "num_params": 1273,
+  "architecture": {
+    "type": "qapinn",
+    "vqc": {
+      "n_qubits": 4,
+      "n_layers": 3,
+      "reupload": true,
+      "entanglement": "linear",
+      "measurement": "multi",
+      "input_scale": 1.0
+    },
+    "coord_map": [
+      0,
+      1,
+      0,
+      1
+    ],
+    "vqc_out_dim": 4,
+    "post": [
+      4,
+      32,
+      32,
+      1
+    ],
+    "param_breakdown": {
+      "vqc": 24,
+      "post": 1249,
+      "total": 1273
+    }
+  },
+  "raw": {
+    "name": "big_qd3_lin_s3",
+    "model": "qapinn",
+    "vqc": {
+      "n_qubits": 4,
+      "n_layers": 3,
+      "reupload": true,
+      "entanglement": "linear",
+      "measurement": "multi",
+      "input_scale": 1.0
+    },
+    "post_hidden": [
+      32,
+      32
+    ],
+    "pde": "burgers",
+    "n_interior": 6000,
+    "n_constraint": 150,
+    "adam_iters": 3000,
+    "adam_lr": 0.01,
+    "lbfgs_iters": 600,
+    "seed": 3,
+    "log_every": 100,
+    "probe_every": 25,
+    "checkpoint_every": 0
+  }
+}
