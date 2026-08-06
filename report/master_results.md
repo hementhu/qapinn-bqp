@@ -21,14 +21,16 @@ Authoritative `rel_l2` / `num_params` from each run's `summary.json`. `train` = 
 
 | config | model | rel-L2 (mean ± std) | vs QAPINN-none |
 |---|---|---|---|
-| big_qd3_none | QAPINN (no ent) | **0.094 ± 0.075** (n=6) | best (but see below) |
+| big_qd3_none | QAPINN (no ent) | **0.094 ± 0.075** (n=6) | best mean (see caveats) |
 | big_qd3_lin | QAPINN (linear) | 0.128 ± 0.056 (n=6) | p=0.44 (n.s.) |
-| big_cls_deep | classical [2,22,22,22,1] | 0.133 ± 0.047 (n=6) | **p=0.35 (n.s.) -- ties QAPINN** |
-| big_cfe | structural control | 0.173 ± 0.048 (n=6) | p=0.076 (marginal) |
-| big_cls_bal | classical [2,32,32,1] | 0.231 ± 0.026 (n=3) | p=0.03 |
+| big_cls_deep | classical [2,22,22,22,1], 1101p | 0.128 ± 0.083 (n=6) | **p=0.51 (n.s.) -- ties QAPINN** |
+| big_cfe | structural control | 0.145 ± 0.091 (n=6) | **p=0.36 (n.s.) -- ties QAPINN** |
+| big_cls_bal | classical [2,32,32,1] | 0.203 ± 0.024 (n=6) | p=0.012 |
 | big_cls | classical [2,16,68,1] shallow | 0.241 ± 0.037 (n=6) | p=0.003 |
 
-**Verdict:** QAPINN beats a *shallow* classical (p=0.003) but a *depth-matched* classical net ties it (0.133 vs 0.094, p=0.35). The advantage is ARCHITECTURAL (depth/post-net width), reproducible classically -- NOT quantum-specific. Entanglement: none vs linear p=0.44 (n.s.).
+**Verdict:** QAPINN beats a *shallow* classical (p=0.003) but is *statistically indistinguishable* from BOTH fair controls -- the structural CFE (p=0.36) and a depth-matched classical net (p=0.51). The gap over shallow classical is ARCHITECTURAL (depth/post-net width), reproducible classically -- NOT quantum-specific.
+
+*Integrity notes (from the final audit): (i) all controls are trained under the QAPINN's EXACT protocol (lr 0.01, n_con 150, Adam 3000 + L-BFGS 600) -- an earlier control-training confound was found and fixed. (ii) The tying net has FEWER params (1101 vs 1273), which favours the classical -- strengthening the no-advantage reading. (iii) The result is UNDERPOWERED: seed variance (~0.08) exceeds the ~0.03 effect, same-seed L-BFGS reruns are non-deterministic, and one qd3_none seed (0.243) is anomalous (dropping it keeps the tie, p=0.19). We state the comparison as 'no significant advantage', not a proven equality.*
 
 ## 1. Base comparison (matched 121 params, undertrained A2000)
 *Heat (smooth, single mode) fits well; Burgers (shock) does not, for either model.*

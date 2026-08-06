@@ -43,8 +43,10 @@ rel-$L_2\approx0.47$), so we re-ran a converged core (L-BFGS on, three seeds).
 The converged results, taken to two model scales with fair controls, give a
 consistent negative. \textbf{(1) No quantum advantage:} at small scale the classical
 PINN ($0.248$) beats every QAPINN; at resolved scale ($\sim$1273 params) the QAPINN
-beats a \emph{shallow} classical ($0.094$ vs $0.24$, $p=0.003$) but \emph{ties} a
-depth-matched classical net ($0.133$, $p=0.35$), so the gain is architectural and
+beats a \emph{shallow} classical ($0.094$ vs $0.24$, $p=0.003$) but is
+statistically indistinguishable from both identically-trained fair controls (a
+depth-matched classical $0.128$, $p=0.51$; a structural CFE $0.145$, $p=0.36$), so
+the gain is architectural and
 classically reproducible. \textbf{(2) No robust entanglement effect:} an $n=3$
 ``entanglement hurts'' signal ($p\approx0.02$) collapsed at $n=6$ ($p=0.41$) and is
 retracted. We also correct the ``band $=$ depth'' framing (verified for the VQC
@@ -346,10 +348,12 @@ cv\_qd3\_lin & QAPINN d3    & 121 & $0.424 \pm 0.005$ & reference QAPINN \\
 ($0.248$) beats every QAPINN; the best (depth-5, $0.314$) only reaches the CFE
 control. \emph{Finding 2 --- larger-model + fair controls (the decider):} repeating
 the core at $\sim$1273 params ($n=6$) against a structural control and a
-depth-matched classical net, the QAPINN-none ($0.094$) beats a shallow classical
-($0.241$, $p=0.003$) but \emph{ties} a depth-matched classical ($0.133$, $p=0.35$)
-and only marginally leads the CFE ($0.173$, $p=0.076$): no significant quantum
-advantage against a fair baseline. \emph{Finding 3 --- entanglement not robust:} the
+depth-matched classical net (both trained under the QAPINN's exact protocol), the
+QAPINN-none ($0.094$) beats a shallow classical ($0.241$, $p=0.003$) but is
+statistically indistinguishable from a depth-matched classical ($0.128$, $p=0.51$)
+and the CFE ($0.145$, $p=0.36$): no significant quantum advantage against a fair
+baseline. (Under-powered: seed variance $\sim$0.08 $>$ the effect, and one anomalous
+seed --- dropping it keeps the tie, $p=0.19$.) \emph{Finding 3 --- entanglement not robust:} the
 $n=3$ ``entanglement hurts'' result ($0.369$ vs $0.424$, $p\approx0.02$) collapsed at
 $n=6$ ($p=0.41$) and is retracted; at large scale the gap is likewise n.s.\ ($p=0.44$).
 \emph{Framing correction:} ``band $=$ depth'' is verified for the VQC features
@@ -372,7 +376,7 @@ own over-claims.
 \section{Current Limitations}
 The findings are firm in direction but bounded: (1) \textbf{modest $n$, underpowered
 nulls} --- the decisive comparisons are \emph{failures to reject} (e.g.\ QAPINN-none
-vs.\ depth-matched classical, $p=0.35$) under high seed variance; we caught one $n=3$
+vs.\ depth-matched classical, $p=0.51$) under high seed variance; we caught one $n=3$
 effect that reversed at $n=6$ (and which Welch's test never called significant even at
 $n=3$, $p=0.06$), so all single-scale nulls are provisional; (2) \textbf{small-model
 regime} --- at 121 params converged models sit at rel-$L_2$ $0.25$--$0.42$, so
@@ -416,7 +420,7 @@ evidence of no quantum advantage.
   \item \textbf{Resolved (larger-model) regime \textnormal{(done):}} we repeated the
   core at $\sim$1273 params ($n=6$) against a structural control (CFE) \emph{and} a
   depth-matched classical net. The QAPINN beats a shallow classical ($0.094$ vs
-  $0.24$, $p=0.003$) but \emph{ties} the depth-matched classical ($0.133$, $p=0.35$):
+  $0.24$, $p=0.003$) but is statistically indistinguishable from the depth-matched classical ($0.128$, $p=0.51$) and CFE ($0.145$, $p=0.36$):
   the advantage is architectural, not quantum-specific. This is the decisive result.
   \item \textbf{Entanglement mechanism \textnormal{(done; moot):}} we measured feature
   correlation and effective rank for \texttt{cv\_qd3\_none} vs \texttt{cv\_qd3\_lin}.

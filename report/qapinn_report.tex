@@ -52,9 +52,11 @@ negative. \textbf{(1) At small (121-param) scale}, the classical PINN
 (rel-$L_2$ $0.248\!\pm\!0.031$) beats every QAPINN. \textbf{(2) At resolved
 (1273-param) scale}, the QAPINN appears to win --- but only against a \emph{shallow}
 classical net: QAPINN-none reaches $0.094\!\pm\!0.075$ vs a shallow classical's
-$0.24$ ($p\!=\!0.003$), yet a \emph{depth-matched} classical net ties it
-($0.133\!\pm\!0.047$, $p\!=\!0.35$), showing the gain is architectural (depth,
-post-net width) and classically reproducible, \emph{not} quantum-specific.
+$0.24$ ($p\!=\!0.003$), yet it is statistically indistinguishable from \emph{both}
+identically-trained fair controls --- a depth-matched classical net
+($0.128\!\pm\!0.083$, $p\!=\!0.51$) and a structural control ($0.145$, $p\!=\!0.36$)
+--- so the gain is architectural (depth, post-net width) and classically
+reproducible, \emph{not} quantum-specific.
 \textbf{(3) No robust entanglement effect:} an $n\!=\!3$ ``entanglement hurts''
 signal ($p\!\approx\!0.02$) \emph{vanished} at $n\!=\!6$ ($p\!=\!0.41$) --- a lucky
 draw we retract; at the larger scale the entanglement gap is likewise
@@ -510,22 +512,28 @@ best QAPINN (depth-5, $0.314$) merely reaches the classical-front-end control
 small-model comparison is between models that only partly resolve the shock
 (rel-$L_2$ $0.25$--$0.42$). We therefore repeated the core at a resolved scale
 ($\sim$1273 params: post-net $[32,32]$, 6000 collocation points), with $n=6$ seeds,
-against \emph{two} fair controls --- a structural control (CFE: identical post-net,
-classical front end) and a \emph{depth-matched} classical net ($[2,22,22,22,1]$).
+against \emph{two} fair controls, \emph{trained under the identical protocol} --- a
+structural control (CFE: identical post-net, classical front end) and a
+\emph{depth-matched} classical net ($[2,22,22,22,1]$).
 \begin{center}\small\begin{tabular}{lcc}\toprule
 model ($\sim$1273p, $n{=}6$) & rel-$L_2$ & vs QAPINN-none \\ \midrule
 QAPINN depth-3, no entanglement & $\mathbf{0.094 \pm 0.075}$ & --- \\
-QAPINN depth-3, linear          & $0.128 \pm 0.056$ & $p=0.44$ \\
-classical, depth-matched $[2,22,22,22,1]$ & $0.133 \pm 0.047$ & $p=0.35$ (n.s.) \\
-CFE structural control          & $0.173 \pm 0.048$ & $p=0.076$ \\
+QAPINN depth-3, linear          & $0.128 \pm 0.056$ & $p=0.44$ (n.s.) \\
+classical, depth-matched $[2,22,22,22,1]$ (1101p) & $0.128 \pm 0.083$ & $p=0.51$ (n.s.) \\
+CFE structural control          & $0.145 \pm 0.091$ & $p=0.36$ (n.s.) \\
 classical, shallow              & $0.241 \pm 0.037$ & $p=0.003$ \\
 \bottomrule\end{tabular}\end{center}
 The QAPINN beats a \emph{shallow} classical net decisively ($p=0.003$), which in
-isolation looks like a resolved-scale quantum advantage. But a \emph{depth-matched}
-classical net closes the gap ($0.133$ vs $0.094$, $p=0.35$, not significant): the
-improvement is \textbf{architectural} (depth and post-net width) and reproducible
-classically, \emph{not} quantum-specific. Against the fair controls there is no
-statistically significant quantum advantage at either scale.
+isolation looks like a resolved-scale quantum advantage. But it is \emph{statistically
+indistinguishable} from \emph{both} fair controls --- the depth-matched classical
+($0.128$ vs $0.094$, $p=0.51$) and the structural CFE ($0.145$, $p=0.36$): the gap
+over the shallow net is \textbf{architectural} (depth, post-net width) and
+reproducible classically, \emph{not} quantum-specific. \emph{We state this as no
+significant advantage, not a proven equality:} the comparison is under-powered (seed
+variance $\sim$0.08 exceeds the $\sim$0.03 effect; same-seed L-BFGS reruns are
+non-deterministic; one \texttt{qd3\_none} seed, $0.243$, is anomalous --- dropping it
+keeps the tie, $p=0.19$), and the tying net has \emph{fewer} parameters (1101 vs
+1273), which if anything favours the classical.
 
 \paragraph{Finding 3 --- no robust entanglement effect (a retraction).} An earlier
 $n=3$ result --- entanglement-none beating linear at convergence, $0.369$ vs $0.424$,
@@ -581,7 +589,7 @@ ours survives none.
 The two converged findings (Section~\ref{sec:converged}) are firm in direction but
 bounded in scope. (1) \textbf{Modest $n$ and an underpowered null:} the converged
 cores use three-to-six seeds, and the decisive comparisons are \emph{failures to
-reject} a difference (e.g.\ QAPINN-none vs.\ depth-matched classical, $p=0.35$),
+reject} a difference (e.g.\ QAPINN-none vs.\ depth-matched classical, $p=0.51$),
 under high seed variance (the $0.094\pm0.075$ QAPINN-none is $\sim$80\% relative
 spread). More seeds would tighten these; we caught one $n=3$ effect that reversed at
 $n=6$, so we treat all single-scale nulls as provisional. (2) \textbf{Small-model

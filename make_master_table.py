@@ -95,16 +95,25 @@ out += ["## 0b. Larger-model regime (~1273 params, L-BFGS on) + FAIR controls --
         "",
         "| config | model | rel-L2 (mean ± std) | vs QAPINN-none |",
         "|---|---|---|---|",
-        f"| big_qd3_none | QAPINN (no ent) | **{bm['big_qd3_none'][0]:.3f} ± {bm['big_qd3_none'][1]:.3f}** (n={bm['big_qd3_none'][2]}) | best (but see below) |",
+        f"| big_qd3_none | QAPINN (no ent) | **{bm['big_qd3_none'][0]:.3f} ± {bm['big_qd3_none'][1]:.3f}** (n={bm['big_qd3_none'][2]}) | best mean (see caveats) |",
         f"| big_qd3_lin | QAPINN (linear) | {bm['big_qd3_lin'][0]:.3f} ± {bm['big_qd3_lin'][1]:.3f} (n={bm['big_qd3_lin'][2]}) | p=0.44 (n.s.) |",
-        f"| big_cls_deep | classical [2,22,22,22,1] | {bm['big_cls_deep'][0]:.3f} ± {bm['big_cls_deep'][1]:.3f} (n={bm['big_cls_deep'][2]}) | **p=0.35 (n.s.) -- ties QAPINN** |",
-        f"| big_cfe | structural control | {bm['big_cfe'][0]:.3f} ± {bm['big_cfe'][1]:.3f} (n={bm['big_cfe'][2]}) | p=0.076 (marginal) |",
-        f"| big_cls_bal | classical [2,32,32,1] | {bm['big_cls_bal'][0]:.3f} ± {bm['big_cls_bal'][1]:.3f} (n={bm['big_cls_bal'][2]}) | p=0.03 |",
+        f"| big_cls_deep | classical [2,22,22,22,1], 1101p | {bm['big_cls_deep'][0]:.3f} ± {bm['big_cls_deep'][1]:.3f} (n={bm['big_cls_deep'][2]}) | **p=0.51 (n.s.) -- ties QAPINN** |",
+        f"| big_cfe | structural control | {bm['big_cfe'][0]:.3f} ± {bm['big_cfe'][1]:.3f} (n={bm['big_cfe'][2]}) | **p=0.36 (n.s.) -- ties QAPINN** |",
+        f"| big_cls_bal | classical [2,32,32,1] | {bm['big_cls_bal'][0]:.3f} ± {bm['big_cls_bal'][1]:.3f} (n={bm['big_cls_bal'][2]}) | p=0.012 |",
         f"| big_cls | classical [2,16,68,1] shallow | {bm['big_cls'][0]:.3f} ± {bm['big_cls'][1]:.3f} (n={bm['big_cls'][2]}) | p=0.003 |",
         "",
-        "**Verdict:** QAPINN beats a *shallow* classical (p=0.003) but a *depth-matched* classical "
-        "net ties it (0.133 vs 0.094, p=0.35). The advantage is ARCHITECTURAL (depth/post-net width), "
-        "reproducible classically -- NOT quantum-specific. Entanglement: none vs linear p=0.44 (n.s.).",
+        "**Verdict:** QAPINN beats a *shallow* classical (p=0.003) but is *statistically "
+        "indistinguishable* from BOTH fair controls -- the structural CFE (p=0.36) and a "
+        "depth-matched classical net (p=0.51). The gap over shallow classical is ARCHITECTURAL "
+        "(depth/post-net width), reproducible classically -- NOT quantum-specific.",
+        "",
+        "*Integrity notes (from the final audit): (i) all controls are trained under the QAPINN's "
+        "EXACT protocol (lr 0.01, n_con 150, Adam 3000 + L-BFGS 600) -- an earlier control-training "
+        "confound was found and fixed. (ii) The tying net has FEWER params (1101 vs 1273), which "
+        "favours the classical -- strengthening the no-advantage reading. (iii) The result is "
+        "UNDERPOWERED: seed variance (~0.08) exceeds the ~0.03 effect, same-seed L-BFGS reruns are "
+        "non-deterministic, and one qd3_none seed (0.243) is anomalous (dropping it keeps the tie, "
+        "p=0.19). We state the comparison as 'no significant advantage', not a proven equality.*",
         ""]
 
 section("1. Base comparison (matched 121 params, undertrained A2000)",
