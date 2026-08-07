@@ -142,12 +142,13 @@ results/         per-run metrics, configs, figures
 
 ## 9. Team members & contributions
 
-> **ACTION REQUIRED (fill before submitting):**
+**Solo project.**
 
-- **[Full name] ([email/GitHub])** — *lead:* research questions, hypotheses, scope,
-  go/no-go decisions, adversarial framing, verification.
-- *[Add any other team members and their specific contributions, or state "solo
-  project" if applicable.]*
+- **Hemanth Bharatula** — GitHub [@hementhu](https://github.com/hementhu). Sole
+  contributor: research questions, hypotheses, scope and go/no-go decisions, the
+  adversarial/Socratic framing that repeatedly tightened the thesis, direction of all
+  implementation and experiments, verification, and the final write-up. AI assistance
+  (Claude Code) was used for implementation and drafting under this direction — see §10.
 
 ## 10. AI-assistant usage (disclosure)
 
@@ -164,4 +165,4 @@ methods, mathematics, and results. A continuous log is in
 result) should be re-derived and owned by the team before defending the submission.
 
 ## Contact
-Questions: [team contact].
+Hemanth Bharatula — GitHub [@hementhu](https://github.com/hementhu).
