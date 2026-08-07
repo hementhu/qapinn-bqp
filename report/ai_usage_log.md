@@ -69,12 +69,75 @@ This log is maintained continuously and will be distilled into the AI-usage disc
   figure used in the report (see `xai_methods.md` and the verification checklist
   below); re-run and confirm each analysis personally.
 
+### Phase 6 — Pipeline verification (2026-07)
+- **AI:** built `verify_pipeline.py` — 8 independent correctness checks (Burgers/heat
+  residuals vs analytic, autograd vs finite differences, VQC-as-Fourier band = depth,
+  relative-L2 metric, matched params, reproducibility). All 8 pass.
+- **Human to own:** confirm each check tests what it claims.
+
+### Phase 7 — Ablations (2026-07)
+- **AI:** ran base comparison (heat/Burgers × classical/QAPINN), Tier-1 (depth,
+  entanglement, post-net), Tier-3 (qubits, measurement, encoding scale), matched
+  classical controls, and a ν-sweep — all single-seed, config-driven, seeded.
+- **Result:** initial (single-seed) readings suggested a "bandwidth-gated advantage."
+
+### Phase 8 — Classical-side analysis & the CFE deflation (2026-07)
+- **Human (lead):** pushed for a *structurally fair* control, not a plain-PINN baseline.
+- **AI:** built the CFE control (classical front end + identical post-net); it
+  **refuted** the "quantum diversifies the classical neurons" claim (inconsistent
+  across knobs; the earlier effect was a mismatched-control artifact).
+
+### Phase 9 — Convergence, seeds, ν-sweep (2026-07)
+- **AI:** long-training runs; 7-seed entanglement statistics (split across two laptops);
+  the ν-sweep aggregation. Found the entanglement differences within seed noise at the
+  undertrained budget.
+
+### Phase 10 — Documentation (2026-07)
+- **AI:** drafted the two reports (submission + extended), the 500-page lab journal,
+  and the master results table; **Human:** directed scope, framing, and what to include.
+
+### Phase 11 — First adversarial self-audit (2026-07)
+- **Human (lead):** ordered a "hard, tough, fresh-eyes" audit of everything.
+- **AI:** ran multi-agent adversarial review (code correctness, experimental design,
+  statistics, number consistency, blind spots) and its own verification. It caught real
+  problems: **undertraining** (L-BFGS was disabled — every Burgers model stuck at
+  ~0.47), a **figure-reference bug** (ν-sweep plots used the wrong reference — fixed), a
+  **category error** ("band = depth" applies to the VQC features, not the post-net-
+  filtered model — a depth-3 model reaches k≈22), and an unsupported **barren-plateau**
+  claim (wrong gradient measured, non-monotone). All fixed/retracted.
+- **Ownership:** the audit's findings and the decision to retract were reviewed and
+  accepted by the human lead.
+
+### Phase 12 — Converged re-run + larger-model test (the keystone, 2026-07/08)
+- **AI:** re-ran a converged core (L-BFGS on, multi-seed) and a larger-model regime
+  (~1273 params) against structural (CFE) and depth-matched classical controls, split
+  across two laptops via Git. Findings: no significant quantum advantage vs a fair
+  baseline; an n=3 "entanglement hurts" signal that **deflated at n=6** and was retracted.
+
+### Phase 13 — Final exhaustive audit + mechanism + README (2026-08)
+- **Human (lead):** ordered an exhaustive final audit; noted the reports gave *facts*
+  but not *why*, and directed a mechanistic account; directed the README/submission prep.
+- **AI:** ran a 4-reviewer final audit (fact-check, consistency, integrity, hostile
+  reviewer). It caught a **control-training confound** (fair controls accidentally
+  trained at 10× lower LR) — **re-run under the correct protocol** (result held and
+  strengthened) — plus internal contradictions from piecewise edits (fixed). Wrote the
+  *Mechanistic Interpretation* section (each claim tagged measured/reasoned) and this
+  README.
+- **Ownership:** all retractions, the confound fix, and the final framing were reviewed
+  and accepted by the human lead.
+
 ---
 
-## Outstanding items to own before submission
+## Outstanding items to own before defending the submission
+Done by the project (but the human lead should still be able to defend each):
+- [x] Final AI-usage disclosure written (README §10, distilled from this log).
+- [x] Every headline number verified against the raw `summary.json` logs (final audit,
+      0 mismatches); non-defensible/over-stated results retracted (3 of them).
+- [x] Pipeline correctness independently audited (8/8) and adversarially re-audited twice.
+
+Still the human lead's to own before a live defence:
 - [ ] Re-derive the Cole–Hopf reference solution independently.
 - [ ] Re-derive the PDE-residual / autograd formulation for each PDE.
-- [ ] Re-derive the VQC-as-Fourier-series result (Schuld [4]) to the level of being able to explain it on a whiteboard.
+- [ ] Re-derive the VQC-as-Fourier-series result (Schuld) to whiteboard level.
 - [ ] Independently verify every citation used in `literature_review.md`.
-- [ ] Re-run and confirm every headline number personally; cut anything not defensible.
-- [ ] Write the final AI-usage disclosure (distilled from this log) for the submission.
+- [ ] Be able to explain each figure and each statistical test in the reports.
