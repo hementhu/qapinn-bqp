@@ -5,32 +5,32 @@ Authoritative `rel_l2` / `num_params` from each run's `summary.json`. `train` = 
 ## 0. Converged core — THE KEYSTONE (L-BFGS on, 3 seeds each)
 *The audit found every earlier Burgers run was undertrained (L-BFGS off → all ~0.47). These re-runs are converged, so comparisons are between resolved models.*
 
-| config | model | params | rel-L2 (mean ± std, n=3) | finding |
+| config | model | params | rel-L2 (mean ± sample sd, n=3) | finding |
 |---|---|---|---|---|
-| cv_cls | classical | 121 | **0.248 ± 0.031** | **best of all** — classical wins |
-| cv_qd5_lin | QAPINN | 137 | 0.314 ± 0.073 | more depth helps; only ties CFE |
-| cv_cfe | CFE control | 109 | 0.315 ± 0.026 | classical front-end control |
-| cv_qd3_none | QAPINN | 121 | 0.369 ± 0.022 | **no-entanglement beats linear** |
-| cv_qd3_lin | QAPINN | 121 | 0.424 ± 0.005 | reference QAPINN — worst |
+| cv_cls | classical | 121 | **0.248 ± 0.038** | **best of all** — classical wins |
+| cv_qd5_lin | QAPINN | 137 | 0.314 ± 0.090 | more depth helps; only ties CFE |
+| cv_cfe | CFE control | 109 | 0.315 ± 0.032 | classical front-end control |
+| cv_qd3_none | QAPINN | 121 | 0.369 ± 0.026 | n=3 gap did not survive n=6 (see below) |
+| cv_qd3_lin | QAPINN | 121 | 0.424 ± 0.007 | reference QAPINN — worst |
 
 **No quantum advantage (small model):** classical (0.248) beats every QAPINN; best QAPINN (depth-5, 0.314) only reaches the CFE control (0.315).  
-**Entanglement effect NOT robust:** at n=3 none (0.369) beat linear (0.424) with p≈0.02 -- but this DEFLATED at n=6 (p=0.41). A lucky 3-seed draw; retracted. See §0b for the larger-model test.
+**Entanglement effect NOT robust:** at n=3 none (0.369) beat linear (0.424) with Student p≈0.02 (Welch p=0.06) -- and this DEFLATED at n=6 (Welch p=0.42). A lucky 3-seed draw; retracted. See §0b for the larger-model test.
 
 ## 0b. Larger-model regime (~1273 params, L-BFGS on) + FAIR controls -- THE DECIDER
 *The small-model (121p) comparison was between failing models. This repeats it at a resolved scale, AND against fair controls (structural CFE + a depth-matched classical). Result: the apparent quantum advantage over a shallow classical net does NOT survive a fairly-chosen (deeper) classical baseline.*
 
-| config | model | rel-L2 (mean ± std) | vs QAPINN-none |
+| config | model | rel-L2 (mean ± sample sd) | vs QAPINN-none (Welch p, report/stats.json) |
 |---|---|---|---|
-| big_qd3_none | QAPINN (no ent) | **0.094 ± 0.075** (n=6) | best mean (see caveats) |
-| big_qd3_lin | QAPINN (linear) | 0.128 ± 0.056 (n=6) | p=0.44 (n.s.) |
-| big_cls_deep | classical [2,22,22,22,1], 1101p | 0.128 ± 0.083 (n=6) | **p=0.51 (n.s.) -- ties QAPINN** |
-| big_cfe | structural control | 0.145 ± 0.091 (n=6) | **p=0.36 (n.s.) -- ties QAPINN** |
-| big_cls_bal | classical [2,32,32,1] | 0.203 ± 0.024 (n=6) | p=0.012 |
-| big_cls | classical [2,16,68,1] shallow | 0.241 ± 0.037 (n=6) | p=0.003 |
+| big_qd3_none | QAPINN (no ent) | **0.094 ± 0.082** (n=6) | best mean (see caveats) |
+| big_qd3_lin | QAPINN (linear) | 0.128 ± 0.061 (n=6) | p=0.44 (n.s.) |
+| big_cls_deep | classical [2,22,22,22,1], 1101p | 0.128 ± 0.091 (n=6) | **p=0.51 (n.s.) -- ties QAPINN** |
+| big_cfe | structural control | 0.145 ± 0.099 (n=6) | **p=0.36 (n.s.) -- ties QAPINN** |
+| big_cls_bal | classical [2,32,32,1] | 0.203 ± 0.027 (n=6) | p=0.021 |
+| big_cls | classical [2,16,68,1] shallow | 0.241 ± 0.041 (n=6) | p=0.005 |
 
-**Verdict:** QAPINN beats a *shallow* classical (p=0.003) but is *statistically indistinguishable* from BOTH fair controls -- the structural CFE (p=0.36) and a depth-matched classical net (p=0.51). The gap over shallow classical is ARCHITECTURAL (depth/post-net width), reproducible classically -- NOT quantum-specific.
+**Verdict:** QAPINN beats a *shallow* classical (p=0.005) but is *statistically indistinguishable* from BOTH fair controls -- the structural CFE (p=0.36) and a depth-matched classical net (p=0.51). The gap over shallow classical is ARCHITECTURAL (depth/post-net width), reproducible classically -- NOT quantum-specific.
 
-*Integrity notes (from the final audit): (i) all controls are trained under the QAPINN's EXACT protocol (lr 0.01, n_con 150, Adam 3000 + L-BFGS 600) -- an earlier control-training confound was found and fixed. (ii) The tying net has FEWER params (1101 vs 1273), which favours the classical -- strengthening the no-advantage reading. (iii) The result is UNDERPOWERED: seed variance (~0.08) exceeds the ~0.03 effect, same-seed L-BFGS reruns are non-deterministic, and one qd3_none seed (0.243) is anomalous (dropping it keeps the tie, p=0.19). We state the comparison as 'no significant advantage', not a proven equality.*
+*Integrity notes (from the final audit): (i) all controls are trained under the QAPINN's EXACT protocol (lr 0.01, n_con 150, Adam 3000 + L-BFGS 600) -- an earlier control-training confound was found and fixed. (ii) The tying net has FEWER params (1101 vs 1273), which favours the classical -- strengthening the no-advantage reading. (iii) The result is UNDERPOWERED: seed variance (~0.08) exceeds the ~0.03 effect, same-seed L-BFGS reruns are non-deterministic, and one qd3_none seed (0.243) is anomalous (dropping it keeps the tie, Welch p=0.17). We state the comparison as 'no significant advantage', not a proven equality.*
 
 ## 1. Base comparison (matched 121 params, undertrained A2000)
 *Heat (smooth, single mode) fits well; Burgers (shock) does not, for either model.*
@@ -53,7 +53,7 @@ Authoritative `rel_l2` / `num_params` from each run's `summary.json`. `train` = 
 | abl_depth_5 | qapinn | 137 | L5,4q,linear | A2000 | **0.424** | best of sweep; error band narrower |
 
 ## 3. Tier-1: entanglement (band fixed, undertrained, single seed)
-*At A2000 accuracy barely moves while entropy swings — LOOKED like a null; convergence later at n=3 looked like entanglement hurts, but this DEFLATED at n=6 (p=0.41) -- retracted; see §0/§0b).*
+*At A2000 accuracy barely moves while entropy swings — LOOKED like a null; convergence later at n=3 looked like entanglement hurts, but this DEFLATED at n=6 (Welch p=0.42) -- retracted; see §0/§0b).*
 
 | run | model | params | config | train | rel-L2 | note |
 |---|---|---|---|---|---|---|
@@ -130,7 +130,7 @@ Authoritative `rel_l2` / `num_params` from each run's `summary.json`. `train` = 
 | cfe_q6 | cfe | 147 | — | A2000 | **0.467** |  |
 
 ## 10. Convergence probes (8000 iter, single seed)
-*An n=3 signal suggested entanglement hurts here; it did NOT survive seed expansion (n=6, p=0.41) -- retracted.*
+*An n=3 signal suggested entanglement hurts here; it did NOT survive seed expansion (n=6, Welch p=0.42) -- retracted.*
 
 | run | model | params | config | train | rel-L2 | note |
 |---|---|---|---|---|---|---|
@@ -143,11 +143,11 @@ Authoritative `rel_l2` / `num_params` from each run's `summary.json`. `train` = 
 
 | config | model | params | n | train | rel-L2 (mean ± std) | note |
 |---|---|---|---|---|---|---|
-| ent=none | QAPINN | 121 | 7 seeds | A2000 | **0.459 ± 0.011** | pooled |
-| ent=linear | QAPINN | 121 | 7 seeds | A2000 | **0.448 ± 0.022** | pooled |
-| ent=ring | QAPINN | 121 | 7 seeds | A2000 | **0.474 ± 0.014** | pooled |
-| ent=all_to_all | QAPINN | 121 | 7 seeds | A2000 | **0.462 ± 0.014** | pooled |
-| classical | classical | 121 | 7 seeds | A2000 | **0.445 ± 0.041** | control |
+| ent=none | QAPINN | 121 | 7 seeds | A2000 | **0.459 ± 0.012** | pooled |
+| ent=linear | QAPINN | 121 | 7 seeds | A2000 | **0.448 ± 0.024** | pooled |
+| ent=ring | QAPINN | 121 | 7 seeds | A2000 | **0.474 ± 0.016** | pooled |
+| ent=all_to_all | QAPINN | 121 | 7 seeds | A2000 | **0.462 ± 0.015** | pooled |
+| classical | classical | 121 | 7 seeds | A2000 | **0.445 ± 0.045** | control |
 
 ## 12. ν-sweep — bandwidth continuum (undertrained, single seed/point)
 *Error rises monotonically as ν falls (bandwidth grows). Advantage is V-shaped, NOT a clean collapse — depth-3 QAPINN loses to matched classical across the family. (Figures fixed for a per-ν reference bug.)*
@@ -167,15 +167,15 @@ Authoritative `rel_l2` / `num_params` from each run's `summary.json`. `train` = 
 
 | claim | status | why |
 |---|---|---|
-| VQC features = Fourier, band = depth | **robust** | proven + verified L=1..6 (isolated qubit) |
+| VQC features = Fourier, band = depth | **robust** | proven + verified L=1..6 (isolated qubit, verify_claims.py) |
 | input_scale 2π collapse = aliasing | **robust** | verified (max harmonic → Nyquist) |
 | Heat (in-band) fits; sharp Burgers doesn't at small budget | **robust** | consistent everywhere |
-| Entanglement hurts at convergence | **REFUTED at n=6** | p=0.02 at n=3 -> p=0.41 at n=6 (lucky draw) |
-| No quantum advantage vs FAIR classical baseline | **robust** | depth-matched classical ties QAPINN (p=0.35, §0b) |
+| Entanglement hurts at convergence | **REFUTED at n=6** | Student p=0.02 / Welch p=0.06 at n=3 -> p=0.42 at n=6 (lucky draw) |
+| No quantum advantage vs FAIR classical baseline | **robust** | depth-matched classical ties QAPINN (p=0.51, §0b) |
 | Apparent large-model advantage is architectural | **robust** | reproducible by a deeper classical net (§0b) |
 | Capacity fixes the shock | refuted | classical error non-monotonic in params (§8) |
-| 'band = depth' limits the FULL model | **refuted (category error)** | depth-3 reaches k22 with training |
+| 'band = depth' limits the FULL model | **soft limit, scale-dependent** | small depth-3 QAPINNs mostly stay at K99=2-6 (ref 13) and error tracks K99 (rho=-0.94); every 1273p model reaches K99 11-14 (verify_claims.py) |
 | Depth 'monotonically' helps | overstated | single-seed; some steps within noise |
 | Barren-plateau in qubit count | **refuted** | non-monotone + measured wrong gradient |
 | Quantum diversifies classical neurons | refuted | died under CFE control (§9) |
-| Entanglement 'not significant' | **confirmed** | n.s. at A2000 AND at convergence n=6 (p=0.41) |
+| Entanglement 'not significant' | **confirmed** | n.s. at A2000 AND at convergence n=6 (p=0.42) |

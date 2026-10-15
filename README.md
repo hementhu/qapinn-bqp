@@ -90,8 +90,11 @@ classical front end, and its extra structure (entanglement) is redundant once a
 flexible post-net follows. The shock defeats every model via classical spectral bias
 (F-principle), which the quantum layer neither causes nor cures.
 
-Full numbers: [`report/master_results.md`](report/master_results.md) (~100 runs).
-Full write-up: [`report/qapinn_report.pdf`](report/qapinn_report.pdf) and the extended
+Full numbers: [`report/master_results.md`](report/master_results.md) (136 runs).
+**Preprint (arXiv version):** [`report/arxiv/main.tex`](report/arxiv/main.tex) — the
+consolidated paper, with Welch statistics computed by `compute_stats.py` and a spectral
+analysis of all 57 converged models (`verify_claims.py`).
+Challenge write-up: [`report/qapinn_report.pdf`](report/qapinn_report.pdf) and the extended
 version with roadmap.
 
 ## 6. Limitations & recommended next steps
@@ -101,7 +104,7 @@ version with roadmap.
   would firm the nulls.
 - **Scope:** 1-D Burgers + heat only; no real CFD (lid-driven cavity is built in
   `src/pdes/cavity.py` but not run); statevector simulation only (no shot noise /
-  hardware) — parameter reduction is **not** resource reduction (~85× slower simulated).
+  hardware) — parameter reduction is **not** resource reduction (QAPINN training ~130–500× slower in wall-clock, simulated).
 - **One reasoned (unmeasured) claim:** the *why* of entanglement neutrality is grounded
   in theory + controls; our direct mechanism probe was inconclusive.
 - **Next:** still-larger scale, more seeds, cross-PDE checks, a probability-vector
@@ -120,7 +123,10 @@ python verify_pipeline.py         # 8/8 correctness checks
 python run.py <config>            # single run
 python run_converged.py all       # the converged core (L-BFGS on, multi-seed)
 python run_followup.py all        # larger-model + fair controls
+python compute_stats.py           # Welch p-values, sample sd -> report/stats.json
+python verify_claims.py           # band=depth L=1..6, output bandwidth of every model -> report/claims.json
 python make_master_table.py       # regenerate report/master_results.md
+python make_arxiv_figs.py         # figures for report/arxiv/
 ```
 Every run is driven by a config + fixed seed; metrics/figures land in `results/<run>/`.
 Heavy artifacts (`*.pt`, `*.npz`, the 500-page journal PDF) are gitignored; the

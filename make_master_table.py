@@ -37,7 +37,7 @@ def row(name, note=""):
 
 def mean(names):
     vals = [s(n)["rel"] for n in names if s(n)]
-    return (np.mean(vals), np.std(vals), len(vals)) if vals else (float("nan"), 0, 0)
+    return (np.mean(vals), np.std(vals, ddof=1), len(vals)) if vals else (float("nan"), 0, 0)
 
 HDR = "| run | model | params | config | train | rel-L2 | note |\n|---|---|---|---|---|---|---|"
 
@@ -58,25 +58,25 @@ out += ["## 0. Converged core — THE KEYSTONE (L-BFGS on, 3 seeds each)",
         "*The audit found every earlier Burgers run was undertrained (L-BFGS off → all ~0.47). "
         "These re-runs are converged, so comparisons are between resolved models.*",
         "",
-        "| config | model | params | rel-L2 (mean ± std, n=3) | finding |",
+        "| config | model | params | rel-L2 (mean ± sample sd, n=3) | finding |",
         "|---|---|---|---|---|",
         f"| cv_cls | classical | 121 | **{m_cls[0]:.3f} ± {m_cls[1]:.3f}** | **best of all** — classical wins |",
         f"| cv_qd5_lin | QAPINN | 137 | {m_d5[0]:.3f} ± {m_d5[1]:.3f} | more depth helps; only ties CFE |",
         f"| cv_cfe | CFE control | 109 | {m_cfe[0]:.3f} ± {m_cfe[1]:.3f} | classical front-end control |",
-        f"| cv_qd3_none | QAPINN | 121 | {m_d3n[0]:.3f} ± {m_d3n[1]:.3f} | **no-entanglement beats linear** |",
+        f"| cv_qd3_none | QAPINN | 121 | {m_d3n[0]:.3f} ± {m_d3n[1]:.3f} | n=3 gap did not survive n=6 (see below) |",
         f"| cv_qd3_lin | QAPINN | 121 | {m_d3l[0]:.3f} ± {m_d3l[1]:.3f} | reference QAPINN — worst |",
         "",
         f"**No quantum advantage (small model):** classical ({m_cls[0]:.3f}) beats every QAPINN; "
         f"best QAPINN (depth-5, {m_d5[0]:.3f}) only reaches the CFE control ({m_cfe[0]:.3f}).  \n"
         f"**Entanglement effect NOT robust:** at n=3 none ({m_d3n[0]:.3f}) beat linear ({m_d3l[0]:.3f}) "
-        "with p≈0.02 -- but this DEFLATED at n=6 (p=0.41). A lucky 3-seed draw; retracted. "
+        "with Student p≈0.02 (Welch p=0.06) -- and this DEFLATED at n=6 (Welch p=0.42). A lucky 3-seed draw; retracted. "
         "See §0b for the larger-model test.",
         ""]
 
 def bigmean(base):
     import numpy as np
     v = [s(f"{base}_s{i}")["rel"] for i in range(9) if s(f"{base}_s{i}")]
-    return (np.mean(v), np.std(v), len(v)) if v else (float("nan"), 0, 0)
+    return (np.mean(v), np.std(v, ddof=1), len(v)) if v else (float("nan"), 0, 0)
 
 def section(title, blurb, rows):
     out.append(f"## {title}")
@@ -86,6 +86,8 @@ def section(title, blurb, rows):
     out.append("")
 
 # ---- 0b. LARGER-MODEL regime + fair controls (THE FINAL TEST) ----
+_st = json.load(open("report/stats.json"))["comparisons"]
+P = {c["b"]: c["welch_p"] for c in _st if c["a"] == "big_qd3_none"}
 bm = {b: bigmean(b) for b in ["big_qd3_none","big_qd3_lin","big_cfe","big_cls_deep","big_cls_bal","big_cls"]}
 out += ["## 0b. Larger-model regime (~1273 params, L-BFGS on) + FAIR controls -- THE DECIDER",
         "*The small-model (121p) comparison was between failing models. This repeats it at a "
@@ -93,18 +95,18 @@ out += ["## 0b. Larger-model regime (~1273 params, L-BFGS on) + FAIR controls --
         "Result: the apparent quantum advantage over a shallow classical net does NOT survive a "
         "fairly-chosen (deeper) classical baseline.*",
         "",
-        "| config | model | rel-L2 (mean ± std) | vs QAPINN-none |",
+        "| config | model | rel-L2 (mean ± sample sd) | vs QAPINN-none (Welch p, report/stats.json) |",
         "|---|---|---|---|",
         f"| big_qd3_none | QAPINN (no ent) | **{bm['big_qd3_none'][0]:.3f} ± {bm['big_qd3_none'][1]:.3f}** (n={bm['big_qd3_none'][2]}) | best mean (see caveats) |",
-        f"| big_qd3_lin | QAPINN (linear) | {bm['big_qd3_lin'][0]:.3f} ± {bm['big_qd3_lin'][1]:.3f} (n={bm['big_qd3_lin'][2]}) | p=0.44 (n.s.) |",
-        f"| big_cls_deep | classical [2,22,22,22,1], 1101p | {bm['big_cls_deep'][0]:.3f} ± {bm['big_cls_deep'][1]:.3f} (n={bm['big_cls_deep'][2]}) | **p=0.51 (n.s.) -- ties QAPINN** |",
-        f"| big_cfe | structural control | {bm['big_cfe'][0]:.3f} ± {bm['big_cfe'][1]:.3f} (n={bm['big_cfe'][2]}) | **p=0.36 (n.s.) -- ties QAPINN** |",
-        f"| big_cls_bal | classical [2,32,32,1] | {bm['big_cls_bal'][0]:.3f} ± {bm['big_cls_bal'][1]:.3f} (n={bm['big_cls_bal'][2]}) | p=0.012 |",
-        f"| big_cls | classical [2,16,68,1] shallow | {bm['big_cls'][0]:.3f} ± {bm['big_cls'][1]:.3f} (n={bm['big_cls'][2]}) | p=0.003 |",
+        f"| big_qd3_lin | QAPINN (linear) | {bm['big_qd3_lin'][0]:.3f} ± {bm['big_qd3_lin'][1]:.3f} (n={bm['big_qd3_lin'][2]}) | p={P['big_qd3_lin']:.2f} (n.s.) |",
+        f"| big_cls_deep | classical [2,22,22,22,1], 1101p | {bm['big_cls_deep'][0]:.3f} ± {bm['big_cls_deep'][1]:.3f} (n={bm['big_cls_deep'][2]}) | **p={P['big_cls_deep']:.2f} (n.s.) -- ties QAPINN** |",
+        f"| big_cfe | structural control | {bm['big_cfe'][0]:.3f} ± {bm['big_cfe'][1]:.3f} (n={bm['big_cfe'][2]}) | **p={P['big_cfe']:.2f} (n.s.) -- ties QAPINN** |",
+        f"| big_cls_bal | classical [2,32,32,1] | {bm['big_cls_bal'][0]:.3f} ± {bm['big_cls_bal'][1]:.3f} (n={bm['big_cls_bal'][2]}) | p={P['big_cls_bal']:.3f} |",
+        f"| big_cls | classical [2,16,68,1] shallow | {bm['big_cls'][0]:.3f} ± {bm['big_cls'][1]:.3f} (n={bm['big_cls'][2]}) | p={P['big_cls']:.3f} |",
         "",
-        "**Verdict:** QAPINN beats a *shallow* classical (p=0.003) but is *statistically "
-        "indistinguishable* from BOTH fair controls -- the structural CFE (p=0.36) and a "
-        "depth-matched classical net (p=0.51). The gap over shallow classical is ARCHITECTURAL "
+        f"**Verdict:** QAPINN beats a *shallow* classical (p={P['big_cls']:.3f}) but is *statistically "
+        f"indistinguishable* from BOTH fair controls -- the structural CFE (p={P['big_cfe']:.2f}) and a "
+        f"depth-matched classical net (p={P['big_cls_deep']:.2f}). The gap over shallow classical is ARCHITECTURAL "
         "(depth/post-net width), reproducible classically -- NOT quantum-specific.",
         "",
         "*Integrity notes (from the final audit): (i) all controls are trained under the QAPINN's "
@@ -113,7 +115,7 @@ out += ["## 0b. Larger-model regime (~1273 params, L-BFGS on) + FAIR controls --
         "favours the classical -- strengthening the no-advantage reading. (iii) The result is "
         "UNDERPOWERED: seed variance (~0.08) exceeds the ~0.03 effect, same-seed L-BFGS reruns are "
         "non-deterministic, and one qd3_none seed (0.243) is anomalous (dropping it keeps the tie, "
-        "p=0.19). We state the comparison as 'no significant advantage', not a proven equality.*",
+        "Welch p=0.17). We state the comparison as 'no significant advantage', not a proven equality.*",
         ""]
 
 section("1. Base comparison (matched 121 params, undertrained A2000)",
@@ -133,7 +135,7 @@ section("2. Tier-1: re-upload depth (undertrained, single seed)",
 
 section("3. Tier-1: entanglement (band fixed, undertrained, single seed)",
     "At A2000 accuracy barely moves while entropy swings — LOOKED like a null; convergence later "
-    "at n=3 looked like entanglement hurts, but this DEFLATED at n=6 (p=0.41) -- retracted; see §0/§0b).",
+    "at n=3 looked like entanglement hurts, but this DEFLATED at n=6 (Welch p=0.42) -- retracted; see §0/§0b).",
     [row("abl_ent_none","entropy ~0 (validates sanity check)"),
      row("abl_baseline","linear (reference)"),
      row("abl_ent_ring","higher entropy, ~same accuracy"),
@@ -178,7 +180,7 @@ section("9. CFE fair controls (undertrained, single seed)",
      row("cfe_q3"), row("cfe_q5"), row("cfe_q6")])
 
 section("10. Convergence probes (8000 iter, single seed)",
-    "An n=3 signal suggested entanglement hurts here; it did NOT survive seed expansion (n=6, p=0.41) -- retracted.",
+    "An n=3 signal suggested entanglement hurts here; it did NOT survive seed expansion (n=6, Welch p=0.42) -- retracted.",
     [row("conv_cls_121","classical, long train"),
      row("conv_qapinn_base","entangled — stays band-limited"),
      row("conv_qapinn_entnone","no-ent — crisp shock, matches k1..20")])
@@ -212,18 +214,18 @@ out += ["## Status ledger — what survived the audit",
         "",
         "| claim | status | why |",
         "|---|---|---|",
-        "| VQC features = Fourier, band = depth | **robust** | proven + verified L=1..6 (isolated qubit) |",
+        "| VQC features = Fourier, band = depth | **robust** | proven + verified L=1..6 (isolated qubit, verify_claims.py) |",
         "| input_scale 2π collapse = aliasing | **robust** | verified (max harmonic → Nyquist) |",
         "| Heat (in-band) fits; sharp Burgers doesn't at small budget | **robust** | consistent everywhere |",
-        "| Entanglement hurts at convergence | **REFUTED at n=6** | p=0.02 at n=3 -> p=0.41 at n=6 (lucky draw) |",
-        "| No quantum advantage vs FAIR classical baseline | **robust** | depth-matched classical ties QAPINN (p=0.35, §0b) |",
+        "| Entanglement hurts at convergence | **REFUTED at n=6** | Student p=0.02 / Welch p=0.06 at n=3 -> p=0.42 at n=6 (lucky draw) |",
+        "| No quantum advantage vs FAIR classical baseline | **robust** | depth-matched classical ties QAPINN (p=0.51, §0b) |",
         "| Apparent large-model advantage is architectural | **robust** | reproducible by a deeper classical net (§0b) |",
         "| Capacity fixes the shock | refuted | classical error non-monotonic in params (§8) |",
-        "| 'band = depth' limits the FULL model | **refuted (category error)** | depth-3 reaches k22 with training |",
+        "| 'band = depth' limits the FULL model | **soft limit, scale-dependent** | small depth-3 QAPINNs mostly stay at K99=2-6 (ref 13) and error tracks K99 (rho=-0.94); every 1273p model reaches K99 11-14 (verify_claims.py) |",
         "| Depth 'monotonically' helps | overstated | single-seed; some steps within noise |",
         "| Barren-plateau in qubit count | **refuted** | non-monotone + measured wrong gradient |",
         "| Quantum diversifies classical neurons | refuted | died under CFE control (§9) |",
-        "| Entanglement 'not significant' | **confirmed** | n.s. at A2000 AND at convergence n=6 (p=0.41) |",
+        "| Entanglement 'not significant' | **confirmed** | n.s. at A2000 AND at convergence n=6 (p=0.42) |",
         ""]
 
 Path("report/master_results.md").write_text("\n".join(out), encoding="utf-8")
