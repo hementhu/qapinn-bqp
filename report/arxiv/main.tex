@@ -21,7 +21,7 @@
 \newcommand{\pw}[1]{$p_{\mathrm{W}}\!=\!#1$}
 
 \title{\textbf{Does the Quantum Layer Matter?\\ A Controlled Study of Quantum-Assisted
-Physics-Informed Neural Networks on Burgers' Equation}}
+Physics-Informed\\ Neural Networks on Burgers' Equation}}
 \author{Hemanth Bharatula\\
 \small Independent researcher\\
 \small \texttt{\textcolor{red}{EMAIL-TO-CONFIRM}}}
@@ -37,23 +37,25 @@ match classical accuracy with fewer trainable parameters. We ask whether the qua
 layer itself is responsible for any change in learning, using a verified,
 parameter-matched bench on 1-D viscous Burgers' equation with an exact Cole--Hopf
 reference, converged training (Adam followed by L-BFGS), up to six seeds per
-configuration, and three kinds of classical control: parameter-matched, structural
-(the same post-network fed by a classical front end), and depth-matched. At
-$\sim$121 parameters the classical PINN has the lowest error ($0.248\pm0.038$) and
-is significantly better than both depth-3 QAPINN variants (Welch $p\le0.009$). At
-$\sim$1273 parameters the best QAPINN ($0.094\pm0.082$) beats a shallow classical
-network ($0.241\pm0.041$, $p=0.005$) but is statistically indistinguishable from a
-depth-matched classical network ($0.128\pm0.091$, $p=0.51$) and from the structural
-control ($0.145\pm0.100$, $p=0.36$). Entanglement has no detectable effect at either
-scale ($p=0.42$, $p=0.44$). A spectral analysis of all 57 trained models explains the
-pattern: error is governed by the realised output bandwidth (Spearman
-$\rho=-0.85$; $\rho=-0.94$ within the small QAPINNs), small depth-3 QAPINNs remain
-close to the low band of their Fourier features, and once the classical post-network
-is large enough every model, quantum or classical, reaches the reference bandwidth.
-The VQC acts as a fixed low-frequency feature map upstream of the component that does
-the representational work. We find no quantum-specific advantage on this problem, and
-we distil the checks that removed three of our own initial positive findings into a
-four-step protocol for evaluating such claims.
+configuration (ten for classical models), and four kinds of classical control:
+parameter-matched, structural (the same post-network fed by a trainable classical front
+end), depth-matched, and random Fourier features with the VQC's frequency range. At
+$\sim$121 parameters the classical PINN has the lowest error ($0.270\pm0.041$) and is
+significantly better than both depth-3 QAPINN variants (Welch $p\le0.001$). At
+$\sim$1273 parameters the best QAPINN ($0.094\pm0.082$) beats shallow and balanced
+classical networks ($p\le0.007$) but is statistically indistinguishable from a
+depth-matched classical network ($0.104\pm0.077$, $p=0.82$) and from the structural
+control ($0.138\pm0.084$, $p=0.34$). Entanglement has no detectable effect at either
+scale ($p=0.42$, $p=0.44$). The quantum layer is not a fixed feature map: four
+\emph{fixed} random Fourier features fail badly ($0.73$--$0.85$), but a trainable
+classical front end of the same width matches the VQC, and sixteen fixed features tie
+it. A spectral analysis of 111 trained models shows that, among models that fit the
+smooth part of the solution, error tracks the realised output bandwidth (Spearman
+$\rho=-0.91$ at small scale): small QAPINNs stay near the low band of their features,
+and a larger classical post-network extends any front end's band to the reference.
+We find no quantum-specific advantage on this problem, and we distil the checks that
+removed three of our own initial positive findings into a four-step protocol for
+evaluating such claims.
 \end{abstract}
 
 % ===========================================================================
@@ -67,6 +69,11 @@ parameters~\cite{qapinn}, and related hybrid designs report similar
 gains~\cite{qcpinn}. Such comparisons are usually single-seed, use one classical
 baseline of a different shape, and are not compute-matched, so they cannot separate
 the effect of the quantum layer from that of architecture, optimisation or seed.
+Recent work on benchmarking quantum machine learning~\cite{bowles} and on dequantising
+variational models with classical Fourier features~\cite{landman,sweke,sahebi} suggests
+that such effects should be tested against strong classical baselines; to our knowledge
+this has not been done for physics-informed training, where the model is fitted to a PDE
+residual rather than to labelled data.
 
 The standard theoretical lens for VQCs is that a circuit with data re-uploading is a
 truncated Fourier series in its inputs~\cite{schuld,reupload}. We ask whether this
@@ -81,11 +88,13 @@ change is specific to the quantum component.
   landscape, generalisation), and released code that regenerates every number in
   this paper from the run logs.
   \item A converged, multi-seed comparison at two model scales against parameter-matched,
-  structural and depth-matched classical controls, which finds no statistically
-  significant quantum-specific advantage and no detectable entanglement effect.
-  \item A spectral explanation: across 57 trained models, test error is governed by
-  the realised output bandwidth; the quantum layer's fixed low band constrains small
-  models and stops mattering once the classical post-network is large enough.
+  structural, depth-matched and random-Fourier-feature classical controls, which finds
+  no statistically significant quantum-specific advantage and no detectable
+  entanglement effect.
+  \item A mechanistic account: the VQC acts as a \emph{trainable} low-frequency feature
+  map that a trainable classical front end of the same width reproduces; across 111
+  trained models, error tracks the realised output bandwidth, which the classical
+  post-network, not the quantum layer, determines.
   \item A four-step protocol (converge, use fair controls, require multi-seed
   significance, separate features from model) that removed three of our own initial
   positive findings.
@@ -109,12 +118,23 @@ is one reason PINNs struggle with sharp features~\cite{wang,krishnapriyan}. Clas
 Fourier-feature front ends were introduced to counter this bias~\cite{tancik}; a VQC
 front end is structurally similar, which motivates our classical front-end control.
 
+\paragraph{Dequantisation and benchmarking.} Because VQC outputs are Fourier series, a
+classical model built on random Fourier features drawn from the circuit's frequency
+spectrum can approximate many variational models~\cite{landman}; the conditions under
+which this works, and where it fails, have since been analysed for regression and
+classification~\cite{sweke,sahebi}. Bowles et al.~\cite{bowles} show in a large
+benchmark that out-of-the-box classical models usually match or beat quantum
+classifiers, and that results are sensitive to hyperparameters and baselines. These
+studies concern supervised learning; we test the same questions for a VQC embedded in
+a PINN and trained only through a PDE residual.
+
 \paragraph{Quantum PDE solvers.} Kyriienko et al.~\cite{dqc} solve nonlinear
 differential equations with differentiable quantum circuits. Hybrid quantum-classical
 PINNs~\cite{qapinn,qcpinn} report parameter savings at similar accuracy, with
 PDE-dependent results (quantum variants sometimes lose, e.g.\ on wave and cavity
-problems~\cite{qcpinn}), and quantum PINNs can collapse to trivial
-solutions~\cite{chen}. Mechanistic explanations in this literature usually appeal to
+problems~\cite{qcpinn}), and a hybrid quantum PINN for high-speed flows was found to be
+efficient on harmonic problems but to struggle on non-harmonic ones~\cite{leong}.
+Quantum PINNs can also collapse to trivial solutions~\cite{chen}. Mechanistic explanations in this literature usually appeal to
 entanglement-driven expressivity without a controlled test, which is the gap we target.
 
 % ===========================================================================
@@ -153,7 +173,13 @@ a \emph{structural} control (CFE) that keeps the QAPINN's post-network but repla
 the VQC with a classical $\mathrm{Linear}(2\to4)+\tanh$ front end, so the only
 difference is a quantum versus classical front end; and, at the larger scale, a
 \emph{depth-matched} classical MLP with the same number of hidden layers as the
-QAPINN counting the VQC as one, plus a \emph{balanced} two-layer MLP.
+QAPINN counting the VQC as one, plus a \emph{balanced} two-layer MLP. Finally, a
+\emph{random-Fourier-feature} control (RFF) replaces the VQC with fixed, untrained
+features $\cos(w_k\cdot(x,t)+b_k)$ whose integer frequencies $w_k\in\{-6,\dots,6\}^2$
+cover the VQC's measured range (Section~\ref{sec:spectral}) and whose phases are
+uniform, drawn afresh for each seed, feeding the identical post-network. We use width 4
+(same post-network input as the QAPINN, fewer parameters) and width 16 (more features,
+more parameters).
 
 \begin{table}[t]
   \centering\small
@@ -161,18 +187,20 @@ QAPINN counting the VQC as one, plus a \emph{balanced} two-layer MLP.
     \toprule
     Scale & Model & Architecture & Params \\
     \midrule
-    \multirow{5}{*}{Small}
+    \multirow{6}{*}{Small}
       & QAPINN, depth 3 (linear / none) & VQC(4q, $L{=}3$) $\to[4,16,1]$ & 121 \\
       & QAPINN, depth 5 (linear) & VQC(4q, $L{=}5$) $\to[4,16,1]$ & 137 \\
       & Classical & $[2,7,11,1]$ & 121 \\
       & CFE (structural) & Linear$(2{\to}4)$+tanh $\to[4,16,1]$ & 109 \\
+      & RFF, width 4 / 16 & fixed $\cos$ features $\to[\cdot,16,1]$ & 97 / 289 \\
     \midrule
-    \multirow{6}{*}{Larger}
+    \multirow{7}{*}{Larger}
       & QAPINN, depth 3 (linear / none) & VQC(4q, $L{=}3$) $\to[4,32,32,1]$ & 1273 \\
       & CFE (structural) & Linear$(2{\to}4)$+tanh $\to[4,32,32,1]$ & 1261 \\
       & Classical, depth-matched & $[2,22,22,22,1]$ & 1101 \\
       & Classical, balanced & $[2,32,32,1]$ & 1185 \\
       & Classical, shallow & $[2,16,68,1]$ & 1273 \\
+      & RFF, width 4 / 16 & fixed $\cos$ features $\to[\cdot,32,32,1]$ & 1249 / 1633 \\
     \bottomrule
   \end{tabular}
   \caption{Models in the converged study. Small: Adam 2500 + L-BFGS 400 iterations,
@@ -183,7 +211,9 @@ QAPINN counting the VQC as one, plus a \emph{balanced} two-layer MLP.
 
 \subsection{Training, statistics and verification}
 Every model at a given scale is trained under the identical protocol of
-Table~\ref{tab:models}. Seeds $0$--$5$ are used where $n=6$ ($0$--$2$ where $n=3$).
+Table~\ref{tab:models}. Seeds $0,\dots,n-1$ are used: $n=10$ for the classical
+baselines and the trainable-front-end control, $n=6$ for QAPINNs and the RFF controls,
+and $n=3$ for the depth-5 QAPINN.
 We report mean $\pm$ sample standard deviation and two-sided Welch $t$-test $p$-values
 (denoted $p$), computed from the per-run logs by a script in the repository; Student
 and Mann--Whitney values are given there for comparison. The VQC is simulated with
@@ -201,10 +231,10 @@ VQC output contains no harmonic above the re-upload depth for $L=1,\dots,6$.
 \subsection{Small scale: the classical PINN is best}\label{sec:small}
 Table~\ref{tab:small} and Fig.~\ref{fig:seeds} (left) give the converged results at
 $\sim$121 parameters. The classical MLP has the lowest mean error and is significantly
-better than both depth-3 QAPINNs ($p=0.003$ against the linear-entanglement reference
-design, $p=0.009$ against the unentangled variant). Increasing VQC depth to 5 lowers
-the QAPINN's error to the level of the structural control ($p=0.99$); the gap to the
-classical MLP is then not significant ($p=0.34$, $n=3$).
+better than both depth-3 QAPINNs ($p=0.001$ against the linear-entanglement reference
+design, $p=0.0001$ against the unentangled variant). Increasing VQC depth to 5 lowers
+the QAPINN's error to the level of the structural control ($p=0.91$); the gap to the
+classical MLP is then not significant ($p=0.49$, $n=3$).
 
 \begin{table}[t]
   \centering\small
@@ -212,11 +242,13 @@ classical MLP is then not significant ($p=0.34$, $n=3$).
     \toprule
     Model & Params & \relL{} (mean $\pm$ sd) & $n$ \\
     \midrule
-    Classical $[2,7,11,1]$ & 121 & $\mathbf{0.248\pm0.038}$ & 3 \\
+    Classical $[2,7,11,1]$ & 121 & $\mathbf{0.270\pm0.041}$ & 10 \\
     QAPINN depth 5, linear & 137 & $0.314\pm0.090$ & 3 \\
-    CFE (structural) & 109 & $0.315\pm0.032$ & 3 \\
+    CFE (structural) & 109 & $0.321\pm0.054$ & 10 \\
     QAPINN depth 3, none & 121 & $0.379\pm0.035$ & 6 \\
     QAPINN depth 3, linear & 121 & $0.402\pm0.056$ & 6 \\
+    RFF, width 16 & 289 & $0.416\pm0.016$ & 6 \\
+    RFF, width 4 & 97 & $0.847\pm0.086$ & 6 \\
     \bottomrule
   \end{tabular}
   \caption{Converged results at small scale on Burgers.}
@@ -227,9 +259,9 @@ classical MLP is then not significant ($p=0.34$, $n=3$).
   \centering
   \includegraphics[width=\textwidth]{seeds.pdf}
   \caption{Per-seed relative $L_2$ error (dots) with mean $\pm$ sd (bars). Red: QAPINN; dark:
-  classical models and controls. Left: small scale. Right: larger scale; the best QAPINN
-  is separated from the shallow classical network but not from the depth-matched or
-  structural controls, and seed-to-seed spread is large.}
+  classical models and controls; grey: random-Fourier-feature controls. Left: small scale. Right: larger scale; the best QAPINN
+  is separated from the shallow and balanced classical networks but not from the
+  depth-matched or structural controls, and seed-to-seed spread is large.}
   \label{fig:seeds}
 \end{figure}
 
@@ -241,36 +273,38 @@ Fig.~\ref{fig:seeds}, right).
 
 \begin{table}[t]
   \centering\small
-  \begin{tabular}{lrcc}
+  \begin{tabular}{lrccc}
     \toprule
-    Model ($n=6$ each) & Params & \relL{} (mean $\pm$ sd) & vs QAPINN-none \\
+    Model & Params & $n$ & \relL{} (mean $\pm$ sd) & vs QAPINN-none \\
     \midrule
-    QAPINN depth 3, none & 1273 & $\mathbf{0.094\pm0.082}$ & --- \\
-    QAPINN depth 3, linear & 1273 & $0.128\pm0.061$ & $p=0.44$ \\
-    Classical, depth-matched & 1101 & $0.128\pm0.091$ & $p=0.51$ \\
-    CFE (structural) & 1261 & $0.145\pm0.100$ & $p=0.36$ \\
-    Classical, balanced & 1185 & $0.203\pm0.027$ & $p=0.021$ \\
-    Classical, shallow & 1273 & $0.241\pm0.041$ & $p=0.005$ \\
+    QAPINN depth 3, none & 1273 & 6 & $\mathbf{0.094\pm0.082}$ & --- \\
+    Classical, depth-matched & 1101 & 10 & $0.104\pm0.077$ & $p=0.82$ \\
+    QAPINN depth 3, linear & 1273 & 6 & $0.128\pm0.061$ & $p=0.44$ \\
+    CFE (structural) & 1261 & 10 & $0.138\pm0.084$ & $p=0.34$ \\
+    RFF, width 16 & 1633 & 6 & $0.167\pm0.080$ & $p=0.15$ \\
+    Classical, balanced & 1185 & 10 & $0.231\pm0.057$ & $p=0.007$ \\
+    Classical, shallow & 1273 & 10 & $0.242\pm0.052$ & $p=0.005$ \\
+    RFF, width 4 & 1249 & 6 & $0.729\pm0.127$ & $p<10^{-4}$ \\
     \bottomrule
   \end{tabular}
-  \caption{Converged results at larger scale. $p$: two-sided Welch $t$-test against
-  QAPINN-none.}
+  \caption{Converged results at larger scale, ordered by mean error. $p$: two-sided Welch
+  $t$-test against QAPINN-none.}
   \label{tab:large}
 \end{table}
 
-Against the shallow classical network alone, the QAPINN appears clearly better
-($p=0.005$; this survives a Holm correction over the five comparisons, while the
-balanced-network comparison, $p=0.021$, does not). Against the two fair controls it is
-not: a depth-matched classical MLP with \emph{fewer} parameters and the structural
-control are both statistically indistinguishable from it. The advantage over the
+Against the shallow and balanced classical networks the QAPINN appears clearly better
+($p=0.005$ and $p=0.007$, both surviving a Holm correction over the seven comparisons).
+Against the fair controls it is not: a depth-matched classical MLP with \emph{fewer}
+parameters has almost the same mean error, and the structural control is also
+statistically indistinguishable from it. The advantage over the
 shallow network is therefore attributable to depth and post-network shape, which a
 classical model reproduces, rather than to the quantum layer.
 
 This is a failure to reject, not a demonstration of equality. Seed-to-seed spread
-($\mathrm{sd}\approx0.08$--$0.10$) exceeds the mean differences ($\approx0.03$--$0.05$),
-so the comparison is under-powered. One QAPINN-none seed ($0.243$) is an outlier;
-removing it lowers the mean but the comparison with the depth-matched control remains
-non-significant ($p=0.17$).
+($\mathrm{sd}\approx0.08$) exceeds the mean differences ($\approx0.01$--$0.04$), so the
+comparison is under-powered. One QAPINN-none seed ($0.243$) is an outlier; removing it
+lowers the mean but the comparison with the depth-matched control remains
+non-significant ($p=0.22$).
 
 \subsection{Entanglement has no detectable effect}\label{sec:ent}
 With three seeds at small scale, the unentangled QAPINN looked better than the linear
@@ -281,7 +315,22 @@ significant ($0.094$ vs $0.128$, $p=0.44$). Earlier single-seed ablations with f
 entanglement patterns (Appendix~\ref{app:prelim}) likewise showed entanglement entropy
 varying widely with no corresponding change in error.
 
-\subsection{Error is governed by output bandwidth}\label{sec:spectral}
+\subsection{The quantum layer is a trainable, not a fixed, feature map}\label{sec:rff}
+Because VQC outputs are Fourier series, the natural classical surrogate is a set of
+random Fourier features from the same frequency range~\cite{landman,sweke}. With four
+fixed features (the QAPINN's post-network input width), this surrogate fails at both
+scales ($0.847$ and $0.729$; $p<10^{-4}$ against the QAPINN): four randomly chosen
+cosines do not span even the smooth part of the solution, and nothing in front of the
+post-network can adjust them. The VQC's 24 trainable rotations do adjust its four
+features, and that matters. But a \emph{trainable} classical front end of the same
+width (the structural control, 12 front-end parameters) matches the VQC: it has lower
+mean error at small scale and is statistically indistinguishable at larger scale. And sixteen fixed features tie the QAPINN without any training of
+the front end (small scale $0.416$ vs $0.402$, $p=0.59$; larger scale $0.167$ vs
+$0.094$, $p=0.15$, and vs $0.128$ for the entangled QAPINN, $p=0.36$). The quantum
+layer is therefore reproducible classically, either by training a narrow front end or
+by widening a fixed one.
+
+\subsection{Error tracks output bandwidth}\label{sec:spectral}
 For every trained model we computed the spatial spectrum of $u_\theta$ on the
 evaluation grid (magnitude of the FFT along $x$, averaged over $t$) and its 99\%-energy
 bandwidth $K_{99}$: the smallest $K$ such that harmonics $1,\dots,K$ hold 99\% of the
@@ -289,23 +338,27 @@ non-constant spectral energy. The reference has $K_{99}=13$.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.55\textwidth]{bandwidth.pdf}
-  \caption{Relative $L_2$ error against the realised output bandwidth $K_{99}$ for all 57
-  converged models (circles: small scale; triangles: larger scale; red: QAPINN). The
-  dashed line is the reference bandwidth.}
+  \includegraphics[width=0.75\textwidth]{bandwidth.pdf}
+  \caption{Relative $L_2$ error against the realised output bandwidth $K_{99}$ for all 111
+  converged models (circles: small scale; triangles: larger scale; red: QAPINN; grey
+  squares: random-Fourier-feature controls). The dashed line is the reference
+  bandwidth. The width-4 RFF models (top) fail for a different reason
+  (Section~\ref{sec:rff}).}
   \label{fig:bandwidth}
 \end{figure}
 
-Figure~\ref{fig:bandwidth} shows a single trend across model families (Spearman
-$\rho=-0.85$, $p<10^{-16}$, $n=57$). Within the small QAPINNs the relation is
-nearly deterministic ($\rho=-0.94$, $n=15$): depth-3 QAPINNs mostly realise
-$K_{99}=2$--$6$, while the small classical MLPs reach $7$--$10$ and the structural
-control $5$--$7$. The one depth-3 seed that reaches $K_{99}=7$ is also the most
-accurate. At the larger scale every QAPINN, structural control and depth-matched
-network reaches $K_{99}=11$--$14$ (some shallow and balanced classical runs stay at
-7--8). Bandwidth then explains much less of the error ($\rho=-0.49$, $n=36$): models at
-the reference bandwidth still range from 0.03 to 0.34, a spread set by how well each
-seed's optimisation resolves the front rather than by which frequencies are present.
+Figure~\ref{fig:bandwidth} shows one trend across model families. Excluding the
+width-4 RFF models, which fail to fit even the smooth part of the solution, error falls
+with bandwidth (Spearman $\rho=-0.81$, $n=99$). The relation is strongest at small scale
+($\rho=-0.91$, $n=41$; $\rho=-0.94$ within the 15 small QAPINNs): depth-3 QAPINNs mostly
+realise $K_{99}=2$--$6$ and the 16-feature RFF control $2$--$4$, both with error near
+$0.4$, while the small classical MLPs reach $6$--$10$. The one depth-3 seed that reaches
+$K_{99}=7$ is also the most accurate. At the larger scale every QAPINN, structural
+control and depth-matched network reaches $K_{99}=11$--$14$ (some shallow, balanced and
+RFF runs stay at 6--8). Bandwidth then explains much less of the error ($\rho=-0.35$,
+$n=58$): models at the reference bandwidth still range from 0.03 to 0.34, a spread set by
+how well each seed's optimisation resolves the front rather than by which frequencies
+are present. Bandwidth is thus necessary for low error but not sufficient.
 
 This corrects a claim in our own earlier analysis. The VQC's \emph{features} are
 band-limited by construction. With $R_Y(x)$ encoding, $L=3$ and two of the four qubits
@@ -332,21 +385,24 @@ but did not test it further.
 We mark each explanation as \emph{measured} (directly supported by our data) or
 \emph{reasoned} (consistent with theory and our controls but not isolated).
 
-\paragraph{The quantum layer is a fixed low-frequency feature map (measured).} With raw
-coordinates as input and $L=3$, the VQC supplies the post-network with trigonometric
-features of bounded frequency. Error tracks how far the post-network can extend that
-band (Section~\ref{sec:spectral}). A classical front end of the same width gives the
-post-network features that are at least as useful: the structural control is better
-than or statistically indistinguishable from the QAPINN at both scales.
+\paragraph{The quantum layer is a trainable low-frequency feature map (measured).} With
+raw coordinates as input and $L=3$, the VQC supplies the post-network with trigonometric
+features whose frequencies are fixed by the encoding and whose coefficients are trained.
+The training matters: four fixed features of the same frequency range fail
+(Section~\ref{sec:rff}). Error then tracks how far the post-network can extend the
+features' band (Section~\ref{sec:spectral}). A trainable classical front end of the same
+width gives the post-network features that are as useful, and sixteen fixed
+Fourier features are enough to match it.
 
 \paragraph{Why there is no quantum-specific advantage (reasoned).} The representational
 work is done by the classical post-network, which sits downstream of the quantum layer.
 A front end only needs to supply features from which the post-network can build the
 solution. Burgers' solution is low-frequency away from the front and needs many
 harmonics at the front; the VQC's band offers no shortcut to the latter, so any front
-end of comparable richness performs similarly. This is the same reason classical
-Fourier-feature front ends~\cite{tancik} help only when their frequencies match the
-target.
+end of comparable richness performs similarly. This mirrors the dequantisation results
+for supervised learning~\cite{landman,sweke}: a model whose quantum part is a
+trainable Fourier series can be matched by a classical model with access to similar
+features.
 
 \paragraph{Why entanglement is neutral (partly measured).} Entanglement does change the
 features: the linear CNOT chain doubles the highest $x$-frequency of the readouts from 3
@@ -383,9 +439,11 @@ positive without the corresponding check:
   Without it, every Burgers model in our preliminary runs stalled at
   \relL{} $0.42$--$0.59$ and the differences between them were within seed noise.
   \item \textbf{Use fair controls.} Compare against a parameter-matched, a structurally
-  matched and a depth-matched classical network, all trained under the same protocol.
-  \item \textbf{Require multi-seed significance.} Use at least six seeds, report the
-  test used, and treat $n=3$ effects as provisional.
+  matched (trainable classical front end) and a depth-matched classical network, plus a
+  Fourier-feature model with the circuit's frequency range, all trained under the same
+  protocol.
+  \item \textbf{Require multi-seed significance.} Use at least six seeds (more for cheap
+  classical models), report the test used, and treat $n=3$ effects as provisional.
   \item \textbf{Separate features from model.} Test Fourier-band claims on the VQC output
   and on the trained model separately.
 \end{enumerate}
@@ -395,13 +453,15 @@ None of ours did.
 % ===========================================================================
 \section{Limitations}
 \begin{enumerate}[nosep]
-  \item \textbf{Statistical power.} With $n\le6$ and seed spread of $\sim$0.08, the
-  decisive comparisons are failures to reject. Same-seed reruns that include L-BFGS
-  are not bit-identical across machines, which adds variance. More seeds would tighten
-  the null results.
+  \item \textbf{Statistical power.} With $n=6$ for the QAPINNs and seed spread of
+  $\sim$0.08, the decisive comparisons are failures to reject. Same-seed reruns that include L-BFGS
+  are not bit-identical across machines, which adds variance. More QAPINN seeds would
+  tighten the null results; each costs hours of simulation.
   \item \textbf{Scope.} One nonlinear PDE in one spatial dimension (plus heat as a
   sanity check), two model scales, 4-qubit circuits, and $R_Y$ encoding of raw
-  coordinates. A lid-driven cavity case is implemented in the code but was not run.
+  coordinates. All models share one learning rate and schedule; per-model tuning could
+  change individual results, though it would not obviously favour the quantum model. A
+  lid-driven cavity case is implemented in the code but was not run.
   Other encodings, larger circuits or other PDEs could behave differently.
   \item \textbf{Simulation only.} Exact statevector simulation without shot noise or
   hardware noise, which would only add difficulties for the quantum model. Fewer
@@ -417,10 +477,11 @@ None of ours did.
 On 1-D Burgers' equation, with converged training, multi-seed statistics and fair
 classical controls, we find no quantum-specific advantage for QAPINNs: at small scale
 the classical PINN is best, and at larger scale the QAPINN ties both a depth-matched
-classical network and a structural control. Entanglement has no detectable effect. A
-spectral analysis of all trained models shows why: error is governed by the bandwidth
-the model realises, the VQC contributes a fixed low-frequency feature map, and the
-classical post-network determines whether that band is extended. Whether an advantage
+classical network and a structural control. Entanglement has no detectable effect. The
+VQC acts as a trainable low-frequency feature map: a trainable classical front end of the
+same width, or a wider set of fixed Fourier features, matches it. Across 111 trained
+models, error tracks the bandwidth the model realises, which the classical
+post-network, not the quantum layer, determines. Whether an advantage
 appears on other PDEs, encodings or scales remains open; the protocol in
 Section~\ref{sec:protocol} is a way to test such a claim.
 
@@ -482,6 +543,20 @@ results, and takes responsibility for the content.
   052416 (2021).
 \bibitem{chen} Chen, Shaviner, Chandravamsi, Pisnoy, Frankel, Pereg. Quantum
   physics-informed neural networks for Maxwell's equations. arXiv:2506.23246 (2025).
+\bibitem{landman} J.~Landman, S.~Thabet, C.~Dalyac, H.~Mhiri, E.~Kashefi. Classically
+  approximating variational quantum machine learning with random Fourier features.
+  arXiv:2210.13200 (2022).
+\bibitem{sweke} R.~Sweke, E.~Recio-Armengol, S.~Jerbi, E.~Gil-Fuster, B.~Fuller,
+  J.~Eisert, J.~J.~Meyer. Potential and limitations of random Fourier features for
+  dequantizing quantum machine learning. \emph{Quantum} \textbf{9}, 1640 (2025).
+\bibitem{sahebi} M.~Sahebi, A.~Barthe, Y.~Suzuki, Z.~Holmes, M.~Grossi. On
+  dequantization of supervised quantum machine learning via random Fourier features.
+  arXiv:2505.15902 (2025).
+\bibitem{bowles} J.~Bowles, S.~Ahmed, M.~Schuld. Better than classical? The subtle art
+  of benchmarking quantum machine learning models. arXiv:2403.07059 (2024).
+\bibitem{leong} F.~Y.~Leong, W.-B.~Ewe, T.~S.~B.~Quang, Z.~Zhang, J.~Y.~Khoo. Hybrid
+  quantum physics-informed neural network: Towards efficient learning of high-speed
+  flows. arXiv:2503.02202 (2025).
 \bibitem{pennylane} V.~Bergholm et al. PennyLane: Automatic differentiation of hybrid
   quantum-classical computations. arXiv:1811.04968 (2018).
 \end{thebibliography}

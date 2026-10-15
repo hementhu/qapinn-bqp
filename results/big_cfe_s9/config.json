@@ -1,0 +1,34 @@
+{
+  "name": "big_cfe_s9",
+  "num_params": 1261,
+  "architecture": {
+    "type": "cfe",
+    "width": 4,
+    "post": [
+      4,
+      32,
+      32,
+      1
+    ],
+    "num_params": 1261
+  },
+  "raw": {
+    "name": "big_cfe_s9",
+    "model": "cfe",
+    "width": 4,
+    "post_hidden": [
+      32,
+      32
+    ],
+    "seed": 9,
+    "pde": "burgers",
+    "n_interior": 6000,
+    "n_constraint": 150,
+    "adam_iters": 3000,
+    "adam_lr": 0.01,
+    "lbfgs_iters": 600,
+    "log_every": 100,
+    "probe_every": 25,
+    "checkpoint_every": 0
+  }
+}

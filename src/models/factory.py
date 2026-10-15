@@ -9,11 +9,12 @@ from __future__ import annotations
 import torch.nn as nn
 
 from src.models.classical_frontend import build_cfe_from_config
+from src.models.fourier_frontend import build_rff_from_config
 from src.models.pinn import PINNMLP
 from src.models.qapinn import QAPINN
 from src.models.vqc import VQCConfig
 
-MODEL_KINDS = ("classical", "qapinn", "cfe")
+MODEL_KINDS = ("classical", "qapinn", "cfe", "rff")
 
 
 def build_model(cfg: dict) -> nn.Module:
@@ -31,6 +32,8 @@ def build_model(cfg: dict) -> nn.Module:
         )
     if kind == "cfe":                       # classical-front-end control
         return build_cfe_from_config(cfg)
+    if kind == "rff":                       # random-Fourier-feature control
+        return build_rff_from_config(cfg)
     raise ValueError(f"unknown model '{kind}', expected one of {MODEL_KINDS}")
 
 

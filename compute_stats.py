@@ -18,7 +18,7 @@ def rel(name):
     return json.load(open(p))["rel_l2"] if p.exists() else None
 
 
-def seeds(base, idx=range(9)):
+def seeds(base, idx=range(12)):
     return [v for v in (rel(f"{base}_s{i}") for i in idx) if v is not None]
 
 
@@ -50,6 +50,11 @@ GROUPS = {
     "big_cfe": seeds("big_cfe"),
     "big_cls_bal": seeds("big_cls_bal"),
     "big_cls": seeds("big_cls"),
+    # random-Fourier-feature controls (fixed integer frequencies |w|<=6)
+    "cv_rff4": seeds("cv_rff4"),
+    "cv_rff16": seeds("cv_rff16"),
+    "big_rff4": seeds("big_rff4"),
+    "big_rff16": seeds("big_rff16"),
 }
 
 COMPARISONS = [
@@ -64,6 +69,11 @@ COMPARISONS = [
     ("big_qd3_none", "big_cls_bal", "large: QAPINN vs balanced classical"),
     ("big_qd3_none", "big_cls_deep", "large: QAPINN vs depth-matched classical"),
     ("big_qd3_none", "big_cfe", "large: QAPINN vs structural CFE control"),
+    ("cv_qd3_lin", "cv_rff4", "small: QAPINN-lin vs RFF width 4"),
+    ("cv_qd3_lin", "cv_rff16", "small: QAPINN-lin vs RFF width 16"),
+    ("big_qd3_none", "big_rff4", "large: QAPINN-none vs RFF width 4"),
+    ("big_qd3_none", "big_rff16", "large: QAPINN-none vs RFF width 16"),
+    ("big_qd3_lin", "big_rff16", "large: QAPINN-lin vs RFF width 16"),
 ]
 
 

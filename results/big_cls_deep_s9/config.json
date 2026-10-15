@@ -1,0 +1,35 @@
+{
+  "name": "big_cls_deep_s9",
+  "num_params": 1101,
+  "architecture": {
+    "type": "classical",
+    "layers": [
+      2,
+      22,
+      22,
+      22,
+      1
+    ]
+  },
+  "raw": {
+    "name": "big_cls_deep_s9",
+    "model": "classical",
+    "layers": [
+      2,
+      22,
+      22,
+      22,
+      1
+    ],
+    "seed": 9,
+    "pde": "burgers",
+    "n_interior": 6000,
+    "n_constraint": 150,
+    "adam_iters": 3000,
+    "adam_lr": 0.01,
+    "lbfgs_iters": 600,
+    "log_every": 100,
+    "probe_every": 25,
+    "checkpoint_every": 0
+  }
+}

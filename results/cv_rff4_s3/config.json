@@ -1,0 +1,52 @@
+{
+  "name": "cv_rff4_s3",
+  "num_params": 97,
+  "architecture": {
+    "type": "rff",
+    "width": 4,
+    "max_freq": 6,
+    "frequencies": [
+      [
+        -4.0,
+        0.0
+      ],
+      [
+        -1.0,
+        -3.0
+      ],
+      [
+        -6.0,
+        4.0
+      ],
+      [
+        -1.0,
+        -4.0
+      ]
+    ],
+    "post": [
+      4,
+      16,
+      1
+    ],
+    "num_params": 97
+  },
+  "raw": {
+    "name": "cv_rff4_s3",
+    "model": "rff",
+    "width": 4,
+    "max_freq": 6,
+    "post_hidden": [
+      16
+    ],
+    "seed": 3,
+    "pde": "burgers",
+    "n_interior": 4000,
+    "n_constraint": 150,
+    "adam_iters": 2500,
+    "adam_lr": 0.01,
+    "lbfgs_iters": 400,
+    "log_every": 100,
+    "probe_every": 25,
+    "checkpoint_every": 0
+  }
+}

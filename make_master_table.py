@@ -48,9 +48,14 @@ out = ["# QAPINN-BQP — Master Experiment Table",
        "understanding (some pre-audit claims were undertrained or mis-framed — see notes).",
        ""]
 
+def bigmean(base):
+    import numpy as np
+    v = [s(f"{base}_s{i}")["rel"] for i in range(12) if s(f"{base}_s{i}")]
+    return (np.mean(v), np.std(v, ddof=1), len(v)) if v else (float("nan"), 0, 0)
+
 # ---- 0. CONVERGED CORE (keystone) ----
-m_cls = mean(["cv_cls_s0","cv_cls_s1","cv_cls_s2"])
-m_cfe = mean(["cv_cfe_s0","cv_cfe_s1","cv_cfe_s2"])
+m_cls = bigmean("cv_cls")
+m_cfe = bigmean("cv_cfe")
 m_d3l = mean(["cv_qd3_lin_s0","cv_qd3_lin_s1","cv_qd3_lin_s2"])
 m_d3n = mean(["cv_qd3_none_s0","cv_qd3_none_s1","cv_qd3_none_s2"])
 m_d5  = mean(["cv_qd5_lin_s0","cv_qd5_lin_s1","cv_qd5_lin_s2"])
@@ -58,11 +63,11 @@ out += ["## 0. Converged core — THE KEYSTONE (L-BFGS on, 3 seeds each)",
         "*The audit found every earlier Burgers run was undertrained (L-BFGS off → all ~0.47). "
         "These re-runs are converged, so comparisons are between resolved models.*",
         "",
-        "| config | model | params | rel-L2 (mean ± sample sd, n=3) | finding |",
+        "| config | model | params | rel-L2 (mean ± sample sd, n) | finding |",
         "|---|---|---|---|---|",
-        f"| cv_cls | classical | 121 | **{m_cls[0]:.3f} ± {m_cls[1]:.3f}** | **best of all** — classical wins |",
+        f"| cv_cls | classical | 121 | **{m_cls[0]:.3f} ± {m_cls[1]:.3f}** (n={m_cls[2]}) | **best of all** — classical wins |",
         f"| cv_qd5_lin | QAPINN | 137 | {m_d5[0]:.3f} ± {m_d5[1]:.3f} | more depth helps; only ties CFE |",
-        f"| cv_cfe | CFE control | 109 | {m_cfe[0]:.3f} ± {m_cfe[1]:.3f} | classical front-end control |",
+        f"| cv_cfe | CFE control | 109 | {m_cfe[0]:.3f} ± {m_cfe[1]:.3f} (n={m_cfe[2]}) | classical front-end control |",
         f"| cv_qd3_none | QAPINN | 121 | {m_d3n[0]:.3f} ± {m_d3n[1]:.3f} | n=3 gap did not survive n=6 (see below) |",
         f"| cv_qd3_lin | QAPINN | 121 | {m_d3l[0]:.3f} ± {m_d3l[1]:.3f} | reference QAPINN — worst |",
         "",
@@ -72,11 +77,6 @@ out += ["## 0. Converged core — THE KEYSTONE (L-BFGS on, 3 seeds each)",
         "with Student p≈0.02 (Welch p=0.06) -- and this DEFLATED at n=6 (Welch p=0.42). A lucky 3-seed draw; retracted. "
         "See §0b for the larger-model test.",
         ""]
-
-def bigmean(base):
-    import numpy as np
-    v = [s(f"{base}_s{i}")["rel"] for i in range(9) if s(f"{base}_s{i}")]
-    return (np.mean(v), np.std(v, ddof=1), len(v)) if v else (float("nan"), 0, 0)
 
 def section(title, blurb, rows):
     out.append(f"## {title}")
@@ -88,7 +88,7 @@ def section(title, blurb, rows):
 # ---- 0b. LARGER-MODEL regime + fair controls (THE FINAL TEST) ----
 _st = json.load(open("report/stats.json"))["comparisons"]
 P = {c["b"]: c["welch_p"] for c in _st if c["a"] == "big_qd3_none"}
-bm = {b: bigmean(b) for b in ["big_qd3_none","big_qd3_lin","big_cfe","big_cls_deep","big_cls_bal","big_cls"]}
+bm = {b: bigmean(b) for b in ["big_qd3_none","big_qd3_lin","big_cfe","big_cls_deep","big_cls_bal","big_cls","big_rff4","big_rff16"]}
 out += ["## 0b. Larger-model regime (~1273 params, L-BFGS on) + FAIR controls -- THE DECIDER",
         "*The small-model (121p) comparison was between failing models. This repeats it at a "
         "resolved scale, AND against fair controls (structural CFE + a depth-matched classical). "
@@ -103,6 +103,8 @@ out += ["## 0b. Larger-model regime (~1273 params, L-BFGS on) + FAIR controls --
         f"| big_cfe | structural control | {bm['big_cfe'][0]:.3f} ± {bm['big_cfe'][1]:.3f} (n={bm['big_cfe'][2]}) | **p={P['big_cfe']:.2f} (n.s.) -- ties QAPINN** |",
         f"| big_cls_bal | classical [2,32,32,1] | {bm['big_cls_bal'][0]:.3f} ± {bm['big_cls_bal'][1]:.3f} (n={bm['big_cls_bal'][2]}) | p={P['big_cls_bal']:.3f} |",
         f"| big_cls | classical [2,16,68,1] shallow | {bm['big_cls'][0]:.3f} ± {bm['big_cls'][1]:.3f} (n={bm['big_cls'][2]}) | p={P['big_cls']:.3f} |",
+        f"| big_rff16 | fixed Fourier features x16, 1633p | {bm['big_rff16'][0]:.3f} ± {bm['big_rff16'][1]:.3f} (n={bm['big_rff16'][2]}) | p={P['big_rff16']:.2f} (n.s.) -- ties QAPINN |",
+        f"| big_rff4 | fixed Fourier features x4, 1249p | {bm['big_rff4'][0]:.3f} ± {bm['big_rff4'][1]:.3f} (n={bm['big_rff4'][2]}) | p={P['big_rff4']:.1e} -- fails |",
         "",
         f"**Verdict:** QAPINN beats a *shallow* classical (p={P['big_cls']:.3f}) but is *statistically "
         f"indistinguishable* from BOTH fair controls -- the structural CFE (p={P['big_cfe']:.2f}) and a "

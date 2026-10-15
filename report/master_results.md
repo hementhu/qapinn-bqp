@@ -5,15 +5,15 @@ Authoritative `rel_l2` / `num_params` from each run's `summary.json`. `train` = 
 ## 0. Converged core — THE KEYSTONE (L-BFGS on, 3 seeds each)
 *The audit found every earlier Burgers run was undertrained (L-BFGS off → all ~0.47). These re-runs are converged, so comparisons are between resolved models.*
 
-| config | model | params | rel-L2 (mean ± sample sd, n=3) | finding |
+| config | model | params | rel-L2 (mean ± sample sd, n) | finding |
 |---|---|---|---|---|
-| cv_cls | classical | 121 | **0.248 ± 0.038** | **best of all** — classical wins |
+| cv_cls | classical | 121 | **0.270 ± 0.041** (n=10) | **best of all** — classical wins |
 | cv_qd5_lin | QAPINN | 137 | 0.314 ± 0.090 | more depth helps; only ties CFE |
-| cv_cfe | CFE control | 109 | 0.315 ± 0.032 | classical front-end control |
+| cv_cfe | CFE control | 109 | 0.321 ± 0.054 (n=10) | classical front-end control |
 | cv_qd3_none | QAPINN | 121 | 0.369 ± 0.026 | n=3 gap did not survive n=6 (see below) |
 | cv_qd3_lin | QAPINN | 121 | 0.424 ± 0.007 | reference QAPINN — worst |
 
-**No quantum advantage (small model):** classical (0.248) beats every QAPINN; best QAPINN (depth-5, 0.314) only reaches the CFE control (0.315).  
+**No quantum advantage (small model):** classical (0.270) beats every QAPINN; best QAPINN (depth-5, 0.314) only reaches the CFE control (0.321).  
 **Entanglement effect NOT robust:** at n=3 none (0.369) beat linear (0.424) with Student p≈0.02 (Welch p=0.06) -- and this DEFLATED at n=6 (Welch p=0.42). A lucky 3-seed draw; retracted. See §0b for the larger-model test.
 
 ## 0b. Larger-model regime (~1273 params, L-BFGS on) + FAIR controls -- THE DECIDER
@@ -23,12 +23,14 @@ Authoritative `rel_l2` / `num_params` from each run's `summary.json`. `train` = 
 |---|---|---|---|
 | big_qd3_none | QAPINN (no ent) | **0.094 ± 0.082** (n=6) | best mean (see caveats) |
 | big_qd3_lin | QAPINN (linear) | 0.128 ± 0.061 (n=6) | p=0.44 (n.s.) |
-| big_cls_deep | classical [2,22,22,22,1], 1101p | 0.128 ± 0.091 (n=6) | **p=0.51 (n.s.) -- ties QAPINN** |
-| big_cfe | structural control | 0.145 ± 0.099 (n=6) | **p=0.36 (n.s.) -- ties QAPINN** |
-| big_cls_bal | classical [2,32,32,1] | 0.203 ± 0.027 (n=6) | p=0.021 |
-| big_cls | classical [2,16,68,1] shallow | 0.241 ± 0.041 (n=6) | p=0.005 |
+| big_cls_deep | classical [2,22,22,22,1], 1101p | 0.104 ± 0.077 (n=10) | **p=0.82 (n.s.) -- ties QAPINN** |
+| big_cfe | structural control | 0.138 ± 0.084 (n=10) | **p=0.34 (n.s.) -- ties QAPINN** |
+| big_cls_bal | classical [2,32,32,1] | 0.231 ± 0.057 (n=10) | p=0.007 |
+| big_cls | classical [2,16,68,1] shallow | 0.242 ± 0.052 (n=10) | p=0.005 |
+| big_rff16 | fixed Fourier features x16, 1633p | 0.167 ± 0.080 (n=6) | p=0.15 (n.s.) -- ties QAPINN |
+| big_rff4 | fixed Fourier features x4, 1249p | 0.729 ± 0.127 (n=6) | p=4.1e-06 -- fails |
 
-**Verdict:** QAPINN beats a *shallow* classical (p=0.005) but is *statistically indistinguishable* from BOTH fair controls -- the structural CFE (p=0.36) and a depth-matched classical net (p=0.51). The gap over shallow classical is ARCHITECTURAL (depth/post-net width), reproducible classically -- NOT quantum-specific.
+**Verdict:** QAPINN beats a *shallow* classical (p=0.005) but is *statistically indistinguishable* from BOTH fair controls -- the structural CFE (p=0.34) and a depth-matched classical net (p=0.82). The gap over shallow classical is ARCHITECTURAL (depth/post-net width), reproducible classically -- NOT quantum-specific.
 
 *Integrity notes (from the final audit): (i) all controls are trained under the QAPINN's EXACT protocol (lr 0.01, n_con 150, Adam 3000 + L-BFGS 600) -- an earlier control-training confound was found and fixed. (ii) The tying net has FEWER params (1101 vs 1273), which favours the classical -- strengthening the no-advantage reading. (iii) The result is UNDERPOWERED: seed variance (~0.08) exceeds the ~0.03 effect, same-seed L-BFGS reruns are non-deterministic, and one qd3_none seed (0.243) is anomalous (dropping it keeps the tie, Welch p=0.17). We state the comparison as 'no significant advantage', not a proven equality.*
 
