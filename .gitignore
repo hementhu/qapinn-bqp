@@ -36,3 +36,7 @@ Thumbs.db
 laptop2_run.log
 laptop2_followup.log
 laptop2c.log
+
+# third-party copyrighted papers (do not publish)
+report/arxiv/BQP*.pdf
+report/arxiv/*.tar.gz

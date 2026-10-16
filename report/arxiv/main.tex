@@ -24,7 +24,7 @@
 Physics-Informed\\ Neural Networks on Burgers' Equation}}
 \author{Hemanth Bharatula\\
 \small Independent researcher\\
-\small \texttt{\textcolor{red}{EMAIL-TO-CONFIRM}}}
+\small \texttt{bharatulahemanth@gmail.com}}
 \date{October 2026}
 
 \begin{document}
@@ -161,7 +161,7 @@ check. Error is the relative $L_2$ norm on a $256\times100$ grid.
   \label{fig:reference}
 \end{figure}
 
-\subsection{Models}
+\subsection{Models}\label{sec:models}
 \textbf{QAPINN}: $(x,t)\to\mathrm{VQC}\to$ classical post-network $\to u$. A fixed map
 sends coordinate $i \bmod 2$ to qubit $i$ (no trainable pre-network, so the Fourier
 band lives directly in $(x,t)$). The VQC has 4 qubits, $L$ layers of $R_Y$ angle
@@ -169,6 +169,19 @@ encoding with re-uploading, trainable rotations, a CNOT pattern (\emph{linear} c
 or \emph{none}), and $\langle Z_i\rangle$ readout. The small post-network is $[4,16,1]$
 ($L=3$: 24 quantum + 97 classical = 121 parameters); the larger one is $[4,32,32,1]$
 (1273 parameters). All networks use $\tanh$.
+
+\textbf{Relation to the reference design.} The reference QA-PINN~\cite{qapinn} solves the
+same problem (identical PDE, viscosity, initial and boundary conditions and domain) with
+the same idea: a VQC replacing the first hidden layer, followed by $\tanh$ classical
+layers. Its circuit differs from ours: 8 layers of trainable $R_X$ rotations with
+alternating blocks of full entanglement, read out as the full $2^n$-dimensional
+probability vector rather than $n$ Pauli-$Z$ expectations; the encoding of $(x,t)$ is not
+specified. It is trained with Adam alone (learning rate $10^{-3}$), evaluated from one run
+per model at four time snapshots, and compared with classical networks in which the
+quantum layer is replaced by a classical one. Our VQC follows the encoding analysed by
+Schuld et al.~\cite{schuld} so that its frequency content is known exactly, and our
+16-feature RFF control is the closest classical analogue of a 4-qubit probability
+readout.
 
 \textbf{Controls} (Table~\ref{tab:models}): a \emph{parameter-matched} classical MLP;
 a \emph{structural} control (CFE) that keeps the QAPINN's post-network but replaces
@@ -486,12 +499,12 @@ None of ours did.
   $\sim$0.08, the decisive comparisons are failures to reject. Same-seed reruns that include L-BFGS
   are not bit-identical across machines, which adds variance. More QAPINN seeds would
   tighten the null results; each costs hours of simulation.
-  \item \textbf{Reference architecture.} Our QAPINN follows the published description of
-  the reference design~\cite{qapinn}: a VQC replacing the first hidden layer of a PINN,
-  with 4 qubits (the reference studies 3--5; our preliminary sweep covers 3--6). Details of
-  the original implementation, such as the encoding, readout and training schedule, are
-  not public and may differ; the reference also compares against an adaptive-activation
-  PINN, which we do not include.
+  \item \textbf{Reference architecture.} Our VQC is not an exact re-implementation of the
+  reference design~\cite{qapinn}, which uses 8 layers of $R_X$ rotations with full
+  entanglement and a probability-vector readout (Section~\ref{sec:models}). Our conclusions concern
+  the architectural idea, a VQC replacing the first hidden layer, and may not transfer
+  to every circuit. We also do not include the reference's adaptive-activation
+  baseline.
   \item \textbf{Scope.} One nonlinear PDE in one spatial dimension (plus heat as a
   sanity check), two model scales, 4-qubit circuits, and $R_Y$ encoding of raw
   coordinates. All models share one learning rate and schedule; per-model tuning could
