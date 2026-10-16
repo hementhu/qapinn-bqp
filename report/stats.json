@@ -276,6 +276,12 @@
       "a": "cv_qd3_none_n3",
       "b": "cv_qd3_lin_n3",
       "label": "entanglement, small model, n=3",
+      "diff": -0.05569559902202398,
+      "ci95": [
+        -0.1167641748479204,
+        0.005372976803872442
+      ],
+      "equiv_bound": 0.0983974006002683,
       "welch_p": 0.06013077918959139,
       "student_p": 0.02409104370235275,
       "mannwhitney_p": 0.1
@@ -284,6 +290,12 @@
       "a": "cv_qd3_none",
       "b": "cv_qd3_lin",
       "label": "entanglement, small model, n=6",
+      "diff": -0.023184188697810748,
+      "ci95": [
+        -0.08510894883654394,
+        0.03874057144092244
+      ],
+      "equiv_bound": 0.07319893838997785,
       "welch_p": 0.41498366334388814,
       "student_p": 0.41097757146306585,
       "mannwhitney_p": 0.13203463203463203
@@ -292,6 +304,12 @@
       "a": "cv_cls",
       "b": "cv_qd3_lin",
       "label": "small: classical vs reference QAPINN",
+      "diff": -0.13169875515367624,
+      "ci95": [
+        -0.19240235830215893,
+        -0.07099515200519355
+      ],
+      "equiv_bound": 0.1807122246486488,
       "welch_p": 0.0009921613973959788,
       "student_p": 9.268672300703872e-05,
       "mannwhitney_p": 0.000999000999000999
@@ -300,6 +318,12 @@
       "a": "cv_cls",
       "b": "cv_qd5_lin",
       "label": "small: classical vs best QAPINN",
+      "diff": -0.04333377785183479,
+      "ci95": [
+        -0.25031978573029845,
+        0.1636522300266289
+      ],
+      "equiv_bound": 0.18819697078664788,
       "welch_p": 0.494823198609821,
       "student_p": 0.24385352755002768,
       "mannwhitney_p": 0.5734265734265734
@@ -308,6 +332,12 @@
       "a": "cv_cls",
       "b": "cv_qd3_none",
       "label": "small: classical vs QAPINN-none (n=6)",
+      "diff": -0.10851456645586549,
+      "ci95": [
+        -0.15029374141450888,
+        -0.0667353914972221
+      ],
+      "equiv_bound": 0.14270609839937487,
       "welch_p": 0.0001008722510686867,
       "student_p": 9.441089885872107e-05,
       "mannwhitney_p": 0.0004995004995004995
@@ -316,14 +346,54 @@
       "a": "cv_cfe",
       "b": "cv_qd5_lin",
       "label": "small: CFE control vs best QAPINN",
+      "diff": 0.0069339604474338845,
+      "ci95": [
+        -0.19137188318684717,
+        0.20523980408171494
+      ],
+      "equiv_bound": 0.1482754890722264,
       "welch_p": 0.9087633066075588,
       "student_p": 0.8685512958127833,
       "mannwhitney_p": 0.5734265734265734
     },
     {
+      "a": "cv_cfe",
+      "b": "cv_qd3_none",
+      "label": "small: CFE (109p) vs QAPINN-none (121p)",
+      "diff": -0.05824682815659682,
+      "ci95": [
+        -0.10588016264725304,
+        -0.010613493665940596
+      ],
+      "equiv_bound": 0.09735434131052115,
+      "welch_p": 0.020105107338516785,
+      "student_p": 0.03414247759341258,
+      "mannwhitney_p": 0.04195804195804197
+    },
+    {
+      "a": "cv_cfe",
+      "b": "cv_qd3_lin",
+      "label": "small: CFE (109p) vs QAPINN-lin (121p)",
+      "diff": -0.08143101685440757,
+      "ci95": [
+        -0.14510858297777832,
+        -0.01775345073103682
+      ],
+      "equiv_bound": 0.13327989379840466,
+      "welch_p": 0.01712984625864058,
+      "student_p": 0.01234465557438713,
+      "mannwhitney_p": 0.031218781218781223
+    },
+    {
       "a": "big_qd3_none",
       "b": "big_qd3_lin",
       "label": "large: entanglement",
+      "diff": -0.03338810527964288,
+      "ci95": [
+        -0.12729501337269045,
+        0.06051880281340469
+      ],
+      "equiv_bound": 0.10955608408884533,
       "welch_p": 0.44309923687313196,
       "student_p": 0.44157457134661227,
       "mannwhitney_p": 0.30952380952380953
@@ -332,6 +402,12 @@
       "a": "big_qd3_none",
       "b": "big_cls",
       "label": "large: QAPINN vs shallow classical",
+      "diff": -0.14786787603464047,
+      "ci95": [
+        -0.23496212180104042,
+        -0.06077363026824052
+      ],
+      "equiv_bound": 0.21788772662547423,
       "welch_p": 0.004752226772345877,
       "student_p": 0.0005588907842397419,
       "mannwhitney_p": 0.004745254745254745
@@ -340,6 +416,12 @@
       "a": "big_qd3_none",
       "b": "big_cls_bal",
       "label": "large: QAPINN vs balanced classical",
+      "diff": -0.13655196852789792,
+      "ci95": [
+        -0.22428617463886097,
+        -0.048817762416934876
+      ],
+      "equiv_bound": 0.20728012724316003,
       "welch_p": 0.007127557046306614,
       "student_p": 0.0014576662447207613,
       "mannwhitney_p": 0.015984015984015984
@@ -348,6 +430,12 @@
       "a": "big_qd3_none",
       "b": "big_cls_deep",
       "label": "large: QAPINN vs depth-matched classical",
+      "diff": -0.009901265203994689,
+      "ci95": [
+        -0.10194480295598213,
+        0.08214227254799275
+      ],
+      "equiv_bound": 0.08480252853151035,
       "welch_p": 0.8156422068897456,
       "student_p": 0.8112357026669941,
       "mannwhitney_p": 0.6353646353646354
@@ -356,6 +444,12 @@
       "a": "big_qd3_none",
       "b": "big_cfe",
       "label": "large: QAPINN vs structural CFE control",
+      "diff": -0.04311767440902585,
+      "ci95": [
+        -0.13739299602940358,
+        0.05115764721135187
+      ],
+      "equiv_bound": 0.12002561854139271,
       "welch_p": 0.335502695003716,
       "student_p": 0.33445772237355775,
       "mannwhitney_p": 0.1805694305694306
@@ -364,6 +458,12 @@
       "a": "cv_qd3_lin",
       "b": "cv_rff4",
       "label": "small: QAPINN-lin vs RFF width 4",
+      "diff": -0.4446324556761007,
+      "ci95": [
+        -0.5400767335185165,
+        -0.34918817783368494
+      ],
+      "equiv_bound": 0.5218506540427785,
       "welch_p": 3.0176717258595e-06,
       "student_p": 9.252075249356495e-07,
       "mannwhitney_p": 0.0021645021645021645
@@ -372,6 +472,12 @@
       "a": "cv_qd3_lin",
       "b": "cv_rff16",
       "label": "small: QAPINN-lin vs RFF width 16",
+      "diff": -0.013570436169264177,
+      "ci95": [
+        -0.072641213319937,
+        0.045500340981408656
+      ],
+      "equiv_bound": 0.060362751414792304,
       "welch_p": 0.5917028397854466,
       "student_p": 0.5828463187495749,
       "mannwhitney_p": 1.0
@@ -380,6 +486,12 @@
       "a": "big_qd3_none",
       "b": "big_rff4",
       "label": "large: QAPINN-none vs RFF width 4",
+      "diff": -0.6344193436594812,
+      "ci95": [
+        -0.7749642964350814,
+        -0.49387439088388096
+      ],
+      "equiv_bound": 0.7480799926820498,
       "welch_p": 4.1413692859268e-06,
       "student_p": 1.2196589714859094e-06,
       "mannwhitney_p": 0.0021645021645021645
@@ -388,6 +500,12 @@
       "a": "big_qd3_none",
       "b": "big_rff16",
       "label": "large: QAPINN-none vs RFF width 16",
+      "diff": -0.07277520076875622,
+      "ci95": [
+        -0.17684324591055628,
+        0.03129284437304382
+      ],
+      "equiv_bound": 0.1574264417772408,
       "welch_p": 0.15024262301186217,
       "student_p": 0.15022101579070904,
       "mannwhitney_p": 0.17965367965367965
@@ -396,14 +514,54 @@
       "a": "big_qd3_lin",
       "b": "big_rff16",
       "label": "large: QAPINN-lin vs RFF width 16",
+      "diff": -0.039387095489113344,
+      "ci95": [
+        -0.13153613790710472,
+        0.05276194692887802
+      ],
+      "equiv_bound": 0.11416451516269904,
       "welch_p": 0.3605115346682248,
       "student_p": 0.35896152242006213,
       "mannwhitney_p": 0.17965367965367965
     },
     {
+      "a": "big_qd3_lin",
+      "b": "big_cls_deep",
+      "label": "large: QAPINN-lin vs depth-matched classical",
+      "diff": 0.02348684007564819,
+      "ci95": [
+        -0.051798957191158485,
+        0.09877263734245487
+      ],
+      "equiv_bound": 0.08516534446324187,
+      "welch_p": 0.5114298448059691,
+      "student_p": 0.5355865281770953,
+      "mannwhitney_p": 0.3676323676323677
+    },
+    {
+      "a": "big_qd3_lin",
+      "b": "big_cfe",
+      "label": "large: QAPINN-lin vs structural CFE control",
+      "diff": -0.00972956912938297,
+      "ci95": [
+        -0.08827455163845108,
+        0.06881541337968514
+      ],
+      "equiv_bound": 0.07415661022038789,
+      "welch_p": 0.793609254240122,
+      "student_p": 0.8097735789210562,
+      "mannwhitney_p": 0.8748751248751249
+    },
+    {
       "a": "big_qd3_none_drop_max",
       "b": "big_cls_deep",
       "label": "large: depth-matched, anomalous QAPINN seed dropped",
+      "diff": -0.03960199884163548,
+      "ci95": [
+        -0.10627907424937748,
+        0.027075076566106512
+      ],
+      "equiv_bound": 0.09422982968491334,
       "welch_p": 0.2213683871979343,
       "student_p": 0.308199065499533,
       "mannwhitney_p": 0.3096903096903097

@@ -28,8 +28,24 @@ def describe(v):
                 min=float(v.min()), max=float(v.max()), values=[float(x) for x in v])
 
 
+def welch_ci(a, b, level):
+    """CI for mean(a) - mean(b) with Welch-Satterthwaite degrees of freedom."""
+    a, b = np.asarray(a), np.asarray(b)
+    va, vb = a.var(ddof=1) / len(a), b.var(ddof=1) / len(b)
+    se = np.sqrt(va + vb)
+    df = (va + vb) ** 2 / (va ** 2 / (len(a) - 1) + vb ** 2 / (len(b) - 1))
+    d = a.mean() - b.mean()
+    h = stats.t.ppf(0.5 + level / 2, df) * se
+    return float(d), float(d - h), float(d + h)
+
+
 def compare(a, b):
-    return dict(welch_p=float(stats.ttest_ind(a, b, equal_var=False).pvalue),
+    d, lo95, hi95 = welch_ci(a, b, 0.95)
+    _, lo90, hi90 = welch_ci(a, b, 0.90)
+    return dict(diff=d, ci95=[lo95, hi95],
+                # TOST at alpha=0.05 establishes equivalence for any margin > this bound
+                equiv_bound=float(max(abs(lo90), abs(hi90))),
+                welch_p=float(stats.ttest_ind(a, b, equal_var=False).pvalue),
                 student_p=float(stats.ttest_ind(a, b, equal_var=True).pvalue),
                 mannwhitney_p=float(stats.mannwhitneyu(a, b, alternative="two-sided").pvalue))
 
@@ -64,6 +80,8 @@ COMPARISONS = [
     ("cv_cls", "cv_qd5_lin", "small: classical vs best QAPINN"),
     ("cv_cls", "cv_qd3_none", "small: classical vs QAPINN-none (n=6)"),
     ("cv_cfe", "cv_qd5_lin", "small: CFE control vs best QAPINN"),
+    ("cv_cfe", "cv_qd3_none", "small: CFE (109p) vs QAPINN-none (121p)"),
+    ("cv_cfe", "cv_qd3_lin", "small: CFE (109p) vs QAPINN-lin (121p)"),
     ("big_qd3_none", "big_qd3_lin", "large: entanglement"),
     ("big_qd3_none", "big_cls", "large: QAPINN vs shallow classical"),
     ("big_qd3_none", "big_cls_bal", "large: QAPINN vs balanced classical"),
@@ -74,6 +92,8 @@ COMPARISONS = [
     ("big_qd3_none", "big_rff4", "large: QAPINN-none vs RFF width 4"),
     ("big_qd3_none", "big_rff16", "large: QAPINN-none vs RFF width 16"),
     ("big_qd3_lin", "big_rff16", "large: QAPINN-lin vs RFF width 16"),
+    ("big_qd3_lin", "big_cls_deep", "large: QAPINN-lin vs depth-matched classical"),
+    ("big_qd3_lin", "big_cfe", "large: QAPINN-lin vs structural CFE control"),
 ]
 
 
@@ -92,9 +112,10 @@ def main():
     print(f"{'group':18s} {'n':>2s} {'mean':>7s} {'sd':>7s}")
     for k, d in desc.items():
         print(f"{k:18s} {d['n']:2d} {d['mean']:7.4f} {d['std']:7.4f}")
-    print(f"\n{'comparison':55s} {'Welch':>7s} {'Student':>8s} {'MWU':>7s}")
+    print(f"\n{'comparison':55s} {'Welch':>7s} {'Student':>8s} {'MWU':>7s} {'diff':>7s} {'95% CI':>17s} {'equiv':>6s}")
     for c in comp:
-        print(f"{c['label']:55s} {c['welch_p']:7.4f} {c['student_p']:8.4f} {c['mannwhitney_p']:7.4f}")
+        print(f"{c['label']:55s} {c['welch_p']:7.4f} {c['student_p']:8.4f} {c['mannwhitney_p']:7.4f} "
+              f"{c['diff']:+7.3f} [{c['ci95'][0]:+.3f},{c['ci95'][1]:+.3f}] {c['equiv_bound']:6.3f}")
     Path("report/stats.json").write_text(json.dumps(dict(groups=desc, comparisons=comp), indent=2))
     print("\nwrote report/stats.json")
 

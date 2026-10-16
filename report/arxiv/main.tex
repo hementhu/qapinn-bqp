@@ -53,6 +53,8 @@ it. A spectral analysis of 111 trained models shows that, among models that fit 
 smooth part of the solution, error tracks the realised output bandwidth (Spearman
 $\rho=-0.91$ at small scale): small QAPINNs stay near the low band of their features,
 and a larger classical post-network extends any front end's band to the reference.
+Against fair classical alternatives the QAPINN shows no parameter saving: a classical
+front end with fewer parameters is more accurate at small scale.
 We find no quantum-specific advantage on this problem, and we distil the checks that
 removed three of our own initial positive findings into a four-step protocol for
 evaluating such claims.
@@ -93,8 +95,8 @@ change is specific to the quantum component.
   entanglement effect.
   \item A mechanistic account: the VQC acts as a \emph{trainable} low-frequency feature
   map that a trainable classical front end of the same width reproduces; across 111
-  trained models, error tracks the realised output bandwidth, which the classical
-  post-network, not the quantum layer, determines.
+  trained models, error tracks the realised output bandwidth, and the bandwidth a model
+  reaches is set mainly by the size of its classical post-network.
   \item A four-step protocol (converge, use fair controls, require multi-seed
   significance, separate features from model) that removed three of our own initial
   positive findings.
@@ -216,7 +218,11 @@ baselines and the trainable-front-end control, $n=6$ for QAPINNs and the RFF con
 and $n=3$ for the depth-5 QAPINN.
 We report mean $\pm$ sample standard deviation and two-sided Welch $t$-test $p$-values
 (denoted $p$), computed from the per-run logs by a script in the repository; Student
-and Mann--Whitney values are given there for comparison. The VQC is simulated with
+and Mann--Whitney values are given there for comparison. For the decisive comparisons
+we also give the 95\% Welch confidence interval of the difference in mean error and an
+\emph{equivalence bound}: the largest absolute difference that the 90\% interval does
+not exclude, so that a two one-sided test at $\alpha=0.05$ would establish equivalence
+for any margin above it. The VQC is simulated with
 PennyLane~\cite{pennylane} (\texttt{default.qubit}, exact statevector, backpropagation
 for the second derivatives the residual needs).
 
@@ -273,22 +279,23 @@ Fig.~\ref{fig:seeds}, right).
 
 \begin{table}[t]
   \centering\small
-  \begin{tabular}{lrccc}
+  \begin{tabular}{lrcccc}
     \toprule
-    Model & Params & $n$ & \relL{} (mean $\pm$ sd) & vs QAPINN-none \\
+    Model & Params & $n$ & \relL{} (mean $\pm$ sd) & $\Delta$ [95\% CI] & $p$ \\
     \midrule
-    QAPINN depth 3, none & 1273 & 6 & $\mathbf{0.094\pm0.082}$ & --- \\
-    Classical, depth-matched & 1101 & 10 & $0.104\pm0.077$ & $p=0.82$ \\
-    QAPINN depth 3, linear & 1273 & 6 & $0.128\pm0.061$ & $p=0.44$ \\
-    CFE (structural) & 1261 & 10 & $0.138\pm0.084$ & $p=0.34$ \\
-    RFF, width 16 & 1633 & 6 & $0.167\pm0.080$ & $p=0.15$ \\
-    Classical, balanced & 1185 & 10 & $0.231\pm0.057$ & $p=0.007$ \\
-    Classical, shallow & 1273 & 10 & $0.242\pm0.052$ & $p=0.005$ \\
-    RFF, width 4 & 1249 & 6 & $0.729\pm0.127$ & $p<10^{-4}$ \\
+    QAPINN depth 3, none & 1273 & 6 & $\mathbf{0.094\pm0.082}$ & --- & --- \\
+    Classical, depth-matched & 1101 & 10 & $0.104\pm0.077$ & $+0.010$ [$-0.08$, $+0.10$] & 0.82 \\
+    QAPINN depth 3, linear & 1273 & 6 & $0.128\pm0.061$ & $+0.033$ [$-0.06$, $+0.13$] & 0.44 \\
+    CFE (structural) & 1261 & 10 & $0.138\pm0.084$ & $+0.043$ [$-0.05$, $+0.14$] & 0.34 \\
+    RFF, width 16 & 1633 & 6 & $0.167\pm0.080$ & $+0.073$ [$-0.03$, $+0.18$] & 0.15 \\
+    Classical, balanced & 1185 & 10 & $0.231\pm0.057$ & $+0.137$ [$+0.05$, $+0.22$] & 0.007 \\
+    Classical, shallow & 1273 & 10 & $0.242\pm0.052$ & $+0.148$ [$+0.06$, $+0.24$] & 0.005 \\
+    RFF, width 4 & 1249 & 6 & $0.729\pm0.127$ & $+0.634$ [$+0.49$, $+0.78$] & $<10^{-4}$ \\
     \bottomrule
   \end{tabular}
-  \caption{Converged results at larger scale, ordered by mean error. $p$: two-sided Welch
-  $t$-test against QAPINN-none.}
+  \caption{Converged results at larger scale, ordered by mean error. $\Delta$: mean error
+  minus that of QAPINN-none (positive: QAPINN-none better), with its 95\% Welch confidence
+  interval; $p$: two-sided Welch $t$-test.}
   \label{tab:large}
 \end{table}
 
@@ -300,11 +307,25 @@ statistically indistinguishable from it. The advantage over the
 shallow network is therefore attributable to depth and post-network shape, which a
 classical model reproduces, rather than to the quantum layer.
 
-This is a failure to reject, not a demonstration of equality. Seed-to-seed spread
-($\mathrm{sd}\approx0.08$) exceeds the mean differences ($\approx0.01$--$0.04$), so the
-comparison is under-powered. One QAPINN-none seed ($0.243$) is an outlier; removing it
-lowers the mean but the comparison with the depth-matched control remains
-non-significant ($p=0.22$).
+This is a failure to reject, not a demonstration of equality, and the confidence
+intervals show how much it rules out. The 95\% interval for the depth-matched control
+excludes an advantage as large as the one over the shallow network ($0.15$), but the
+equivalence bound is $0.085$: with mean errors near $0.1$, a QAPINN advantage of up to
+about $0.09$ is not excluded by these data. The bounds against the structural control
+($0.12$) and between the two QAPINN variants ($0.11$) are similar. Seed-to-seed spread
+($\mathrm{sd}\approx0.08$) is the limiting factor. One QAPINN-none seed ($0.243$) is an
+outlier; removing it lowers the mean but the comparison with the depth-matched control
+remains non-significant ($p=0.22$).
+
+\paragraph{Parameter efficiency.} The original claim for QAPINNs is equal accuracy with
+fewer parameters~\cite{qapinn}. In our data the reverse holds against fair classical
+alternatives. At small scale the structural control, with 109 parameters, has
+\emph{lower} error than both 121-parameter depth-3 QAPINNs ($0.321$ vs $0.379$ and
+$0.402$; $p=0.020$ and $p=0.017$). At larger scale the depth-matched classical network
+ties the best QAPINN with 14\% fewer parameters (1101 vs 1273). A saving of the reported
+size does appear against the shallow classical network, which has as many parameters as
+the QAPINN and $2.6$ times its error; such a saving therefore depends on the choice of
+classical baseline.
 
 \subsection{Entanglement has no detectable effect}\label{sec:ent}
 With three seeds at small scale, the unentangled QAPINN looked better than the linear
@@ -325,7 +346,7 @@ post-network can adjust them. The VQC's 24 trainable rotations do adjust its fou
 features, and that matters. But a \emph{trainable} classical front end of the same
 width (the structural control, 12 front-end parameters) matches the VQC: it has lower
 mean error at small scale and is statistically indistinguishable at larger scale. And sixteen fixed features tie the QAPINN without any training of
-the front end (small scale $0.416$ vs $0.402$, $p=0.59$; larger scale $0.167$ vs
+the front end (small scale $0.416$ vs $0.402$, $p=0.59$, equivalence bound $0.06$; larger scale $0.167$ vs
 $0.094$, $p=0.15$, and vs $0.128$ for the entangled QAPINN, $p=0.36$). The quantum
 layer is therefore reproducible classically, either by training a narrow front end or
 by widening a fixed one.
@@ -359,6 +380,13 @@ RFF runs stay at 6--8). Bandwidth then explains much less of the error ($\rho=-0
 $n=58$): models at the reference bandwidth still range from 0.03 to 0.34, a spread set by
 how well each seed's optimisation resolves the front rather than by which frequencies
 are present. Bandwidth is thus necessary for low error but not sufficient.
+
+This relation is partly built in: a model that matches the reference closely must also
+match its spectrum. We therefore use bandwidth as a diagnostic of \emph{what} a model is
+missing, not as an independent cause of its error. Two features make it informative.
+It separates failure modes (the width-4 RFF models have moderate bandwidth but fail for
+another reason), and it shows that the small models' deficit is specifically in the
+high harmonics needed at the front.
 
 This corrects a claim in our own earlier analysis. The VQC's \emph{features} are
 band-limited by construction. With $R_Y(x)$ encoding, $L=3$ and two of the four qubits
@@ -443,7 +471,8 @@ positive without the corresponding check:
   Fourier-feature model with the circuit's frequency range, all trained under the same
   protocol.
   \item \textbf{Require multi-seed significance.} Use at least six seeds (more for cheap
-  classical models), report the test used, and treat $n=3$ effects as provisional.
+  classical models), report the test used with confidence intervals, state what a null
+  result does and does not exclude, and treat $n=3$ effects as provisional.
   \item \textbf{Separate features from model.} Test Fourier-band claims on the VQC output
   and on the trained model separately.
 \end{enumerate}
@@ -480,8 +509,9 @@ the classical PINN is best, and at larger scale the QAPINN ties both a depth-mat
 classical network and a structural control. Entanglement has no detectable effect. The
 VQC acts as a trainable low-frequency feature map: a trainable classical front end of the
 same width, or a wider set of fixed Fourier features, matches it. Across 111 trained
-models, error tracks the bandwidth the model realises, which the classical
-post-network, not the quantum layer, determines. Whether an advantage
+models, error tracks the bandwidth the model realises, and that bandwidth is set mainly
+by the size of the classical post-network. Against fair classical alternatives the
+QAPINN shows no parameter saving. Whether an advantage
 appears on other PDEs, encodings or scales remains open; the protocol in
 Section~\ref{sec:protocol} is a way to test such a claim.
 
