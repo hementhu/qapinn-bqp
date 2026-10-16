@@ -20,8 +20,8 @@
 \newcommand{\relL}{relative $L_2$}
 \newcommand{\pw}[1]{$p_{\mathrm{W}}\!=\!#1$}
 
-\title{\textbf{Does the Quantum Layer Matter?\\ A Controlled Study of Quantum-Assisted
-Physics-Informed\\ Neural Networks on Burgers' Equation}}
+\title{\textbf{Dequantizing Quantum-Assisted Physics-Informed Neural Networks:\\
+Spectral Evidence on Burgers' Equation}}
 \author{Hemanth Bharatula\\
 \small Independent researcher\\
 \small \texttt{bharatulahemanth@gmail.com}}
@@ -67,7 +67,10 @@ Recent work on benchmarking quantum machine learning~\cite{bowles} and on dequan
 variational models with classical Fourier features~\cite{landman,sweke,sahebi} suggests
 that such effects should be tested against strong classical baselines; to our knowledge
 this has not been done for physics-informed training, where the model is fitted to a PDE
-residual rather than to labelled data.
+residual rather than to labelled data. We use \emph{dequantizing} in this empirical
+sense~\cite{landman,sweke}: showing that classical models match the quantum layer's
+contribution on a given problem, rather than proving a general classical simulation
+result.
 
 The standard theoretical lens for VQCs is that a circuit with data re-uploading is a
 truncated Fourier series in its inputs~\cite{schuld,reupload}. We ask whether this
