@@ -15,6 +15,7 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{caption}
 \usepackage{enumitem}
+\usepackage{float}
 
 \graphicspath{{figs/}}
 \newcommand{\relL}{relative $L_2$}
@@ -608,7 +609,8 @@ results, and takes responsibility for the content.
 % ===========================================================================
 \appendix
 \section{Pipeline verification}\label{app:verify}
-\begin{table}[h]
+Table~\ref{tab:verify} lists the correctness checks run before any comparison; all pass.
+\begin{table}[H]
   \centering\small
   \begin{tabular}{lll}
     \toprule
@@ -624,6 +626,7 @@ results, and takes responsibility for the content.
     \bottomrule
   \end{tabular}
   \caption{Correctness checks (\texttt{verify\_pipeline.py}, \texttt{verify\_claims.py}).}
+  \label{tab:verify}
 \end{table}
 
 \section{Preliminary single-seed ablations}\label{app:prelim}
