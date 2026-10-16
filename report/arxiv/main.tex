@@ -31,33 +31,25 @@ Physics-Informed\\ Neural Networks on Burgers' Equation}}
 \maketitle
 
 \begin{abstract}
-Quantum-assisted physics-informed neural networks (QAPINNs) replace the first
-hidden layer of a PINN with a variational quantum circuit (VQC) and are reported to
-match classical accuracy with fewer trainable parameters. We ask whether the quantum
-layer itself is responsible for any change in learning, using a verified,
-parameter-matched bench on 1-D viscous Burgers' equation with an exact Cole--Hopf
-reference, converged training (Adam followed by L-BFGS), up to six seeds per
-configuration (ten for classical models), and four kinds of classical control:
-parameter-matched, structural (the same post-network fed by a trainable classical front
-end), depth-matched, and random Fourier features with the VQC's frequency range. At
-$\sim$121 parameters the classical PINN has the lowest error ($0.270\pm0.041$) and is
-significantly better than both depth-3 QAPINN variants (Welch $p\le0.001$). At
-$\sim$1273 parameters the best QAPINN ($0.094\pm0.082$) beats shallow and balanced
-classical networks ($p\le0.007$) but is statistically indistinguishable from a
-depth-matched classical network ($0.104\pm0.077$, $p=0.82$) and from the structural
-control ($0.138\pm0.084$, $p=0.34$). Entanglement has no detectable effect at either
-scale ($p=0.42$, $p=0.44$). The quantum layer is not a fixed feature map: four
-\emph{fixed} random Fourier features fail badly ($0.73$--$0.85$), but a trainable
-classical front end of the same width matches the VQC, and sixteen fixed features tie
-it. A spectral analysis of 111 trained models shows that, among models that fit the
-smooth part of the solution, error tracks the realised output bandwidth (Spearman
-$\rho=-0.91$ at small scale): small QAPINNs stay near the low band of their features,
-and a larger classical post-network extends any front end's band to the reference.
-Against fair classical alternatives the QAPINN shows no parameter saving: a classical
-front end with fewer parameters is more accurate at small scale.
-We find no quantum-specific advantage on this problem, and we distil the checks that
-removed three of our own initial positive findings into a four-step protocol for
-evaluating such claims.
+Quantum-assisted physics-informed neural networks (QAPINNs) replace the first hidden
+layer of a PINN with a variational quantum circuit (VQC) and are reported to match
+classical accuracy with fewer parameters. We test whether the quantum layer itself
+changes learning, on 1-D viscous Burgers' equation with an exact reference, converged
+training (Adam then L-BFGS), six to ten seeds per model, and four classical controls:
+parameter-matched, structural (the same post-network behind a trainable classical front
+end), depth-matched, and random Fourier features spanning the VQC's frequencies. At
+$\sim$121 parameters the classical PINN is best ($0.270\pm0.041$) and significantly
+better than both depth-3 QAPINNs ($p\le0.001$). At $\sim$1273 parameters the best QAPINN
+($0.094\pm0.082$) beats shallow classical networks ($p\le0.007$) but is statistically
+indistinguishable from a depth-matched classical network ($0.104\pm0.077$, $p=0.82$) and
+the structural control ($p=0.34$). Entanglement has no detectable effect. The VQC acts as
+a trainable low-frequency feature map: four fixed Fourier features fail, but a trainable
+classical front end of the same width matches it and sixteen fixed features tie it.
+Across 111 trained models, error tracks the realised output bandwidth (Spearman
+$\rho=-0.91$ at small scale), which a larger classical post-network extends. Against fair
+classical alternatives the QAPINN shows no parameter saving. We find no quantum-specific
+advantage here, and distil the checks that overturned three of our own initial positive
+findings into a four-step protocol for evaluating such claims.
 \end{abstract}
 
 % ===========================================================================
