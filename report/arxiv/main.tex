@@ -487,9 +487,11 @@ None of ours did.
   are not bit-identical across machines, which adds variance. More QAPINN seeds would
   tighten the null results; each costs hours of simulation.
   \item \textbf{Reference architecture.} Our QAPINN follows the published description of
-  the reference design~\cite{qapinn} (raw coordinates angle-encoded into a 4-qubit VQC
-  that replaces the first hidden layer); details of the original implementation, such as
-  the encoding, readout or training schedule, may differ.
+  the reference design~\cite{qapinn}: a VQC replacing the first hidden layer of a PINN,
+  with 4 qubits (the reference studies 3--5; our preliminary sweep covers 3--6). Details of
+  the original implementation, such as the encoding, readout and training schedule, are
+  not public and may differ; the reference also compares against an adaptive-activation
+  PINN, which we do not include.
   \item \textbf{Scope.} One nonlinear PDE in one spatial dimension (plus heat as a
   sanity check), two model scales, 4-qubit circuits, and $R_Y$ encoding of raw
   coordinates. All models share one learning rate and schedule; per-model tuning could
@@ -539,10 +541,10 @@ results, and takes responsibility for the content.
   networks: A deep learning framework for solving forward and inverse problems involving
   nonlinear partial differential equations. \emph{J.\ Comput.\ Phys.}\ \textbf{378},
   686--707 (2019).
-\bibitem{qapinn} J.~Shah, R.~Lineswala, A.~Chopra. Benchmarking quantum-assisted
-  physics-informed neural networks (QA-PINN) for computational fluid dynamics.
-  \emph{IEEE International Conference on Quantum Computing and Engineering (QCE)}
-  (2024). \textcolor{red}{[VENUE/DOI TO CONFIRM]}
+\bibitem{qapinn} J.~Shah, R.~Lineswala, A.~Chopra. Benchmarking quantum-assisted PINN
+  (QA-PINN) for computational fluid dynamics. In \emph{2024 IEEE International Conference
+  on Quantum Computing and Engineering (QCE)}, pp.~1707--1712 (2024).
+  doi:10.1109/QCE60285.2024.00199.
 \bibitem{qcpinn} A.~Farea, S.~Khan, M.~S.~Celebi. QCPINN: Quantum-classical
   physics-informed neural networks for solving PDEs. arXiv:2503.16678 (2025).
 \bibitem{schuld} M.~Schuld, R.~Sweke, J.~J.~Meyer. Effect of data encoding on the
