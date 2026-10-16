@@ -35,7 +35,7 @@ Quantum-assisted physics-informed neural networks (QAPINNs) replace the first hi
 layer of a PINN with a variational quantum circuit (VQC) and are reported to match
 classical accuracy with fewer parameters. We test whether the quantum layer itself
 changes learning, on 1-D viscous Burgers' equation with an exact reference, converged
-training (Adam then L-BFGS), six to ten seeds per model, and four classical controls:
+training (Adam then L-BFGS), three to ten seeds per model, and four classical controls:
 parameter-matched, structural (the same post-network behind a trainable classical front
 end), depth-matched, and random Fourier features spanning the VQC's frequencies. At
 $\sim$121 parameters the classical PINN is best ($0.270\pm0.041$) and significantly
