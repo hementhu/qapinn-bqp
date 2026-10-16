@@ -20,7 +20,7 @@
 \newcommand{\relL}{relative $L_2$}
 \newcommand{\pw}[1]{$p_{\mathrm{W}}\!=\!#1$}
 
-\title{\textbf{Dequantizing Quantum-Assisted Physics-Informed Neural Networks:\\
+\title{\textbf{Dequantizing Quantum-Assisted\\ Physics-Informed Neural Networks:\\
 Spectral Evidence on Burgers' Equation}}
 \author{Hemanth Bharatula\\
 \small Independent researcher\\
@@ -63,7 +63,7 @@ parameters~\cite{qapinn}, and related hybrid designs report similar
 gains~\cite{qcpinn}. Such comparisons are usually single-seed, use one classical
 baseline of a different shape, and are not compute-matched, so they cannot separate
 the effect of the quantum layer from that of architecture, optimisation or seed.
-Recent work on benchmarking quantum machine learning~\cite{bowles} and on dequantising
+Recent work on benchmarking quantum machine learning~\cite{bowles} and on dequantizing
 variational models with classical Fourier features~\cite{landman,sweke,sahebi} suggests
 that such effects should be tested against strong classical baselines; to our knowledge
 this has not been done for physics-informed training, where the model is fitted to a PDE
@@ -115,7 +115,7 @@ is one reason PINNs struggle with sharp features~\cite{wang,krishnapriyan}. Clas
 Fourier-feature front ends were introduced to counter this bias~\cite{tancik}; a VQC
 front end is structurally similar, which motivates our classical front-end control.
 
-\paragraph{Dequantisation and benchmarking.} Because VQC outputs are Fourier series, a
+\paragraph{Dequantization and benchmarking.} Because VQC outputs are Fourier series, a
 classical model built on random Fourier features drawn from the circuit's frequency
 spectrum can approximate many variational models~\cite{landman}; the conditions under
 which this works, and where it fails, have since been analysed for regression and
@@ -435,7 +435,7 @@ work is done by the classical post-network, which sits downstream of the quantum
 A front end only needs to supply features from which the post-network can build the
 solution. Burgers' solution is low-frequency away from the front and needs many
 harmonics at the front; the VQC's band offers no shortcut to the latter, so any front
-end of comparable richness performs similarly. This mirrors the dequantisation results
+end of comparable richness performs similarly. This mirrors the dequantization results
 for supervised learning~\cite{landman,sweke}: a model whose quantum part is a
 trainable Fourier series can be matched by a classical model with access to similar
 features.
